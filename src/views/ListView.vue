@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { Search, Right } from '@element-plus/icons-vue'
 
 const router = useRouter()
 
@@ -9,15 +10,26 @@ interface ListItem {
   title: string
   price: number
   desc: string
+  tag: string
+  tagType: '' | 'success' | 'warning' | 'info' | 'danger'
 }
 
 const items = ref<ListItem[]>([
-  { id: 1, title: '二手教材-高等数学', price: 15, desc: '九成新，几乎无笔记' },
-  { id: 2, title: '机械键盘 IKBC C87', price: 80, desc: '樱桃红轴，使用一年' },
-  { id: 3, title: '台灯 LED 护眼', price: 25, desc: '三档调光，配件齐全' },
-  { id: 4, title: '代取快递服务', price: 3, desc: '校内驿站代取，当日送达' },
-  { id: 5, title: '考研英语真题集', price: 20, desc: '2024版，含解析册' },
+  { id: 1, title: '二手教材-高等数学', price: 15, desc: '九成新，几乎无笔记', tag: '教材', tagType: 'info' },
+  { id: 2, title: '机械键盘 IKBC C87', price: 80, desc: '樱桃红轴，使用一年', tag: '数码', tagType: 'success' },
+  { id: 3, title: '台灯 LED 护眼', price: 25, desc: '三档调光，配件齐全', tag: '生活', tagType: 'warning' },
+  { id: 4, title: '代取快递服务', price: 3, desc: '校内驿站代取，当日送达', tag: '服务', tagType: 'danger' },
+  { id: 5, title: '考研英语真题集', price: 20, desc: '2024版，含解析册', tag: '教材', tagType: 'info' },
 ])
+
+const searchKeyword = ref('')
+
+const filteredItems = computed(() => {
+  if (!searchKeyword.value) return items.value
+  return items.value.filter(
+    i => i.title.includes(searchKeyword.value) || i.desc.includes(searchKeyword.value)
+  )
+})
 
 function goDetail(id: number) {
   router.push({ name: 'Detail', params: { id } })
@@ -26,77 +38,152 @@ function goDetail(id: number) {
 
 <template>
   <div class="list-page">
-    <h1>信息列表</h1>
-    <p class="subtitle">浏览校园内的二手商品与服务信息</p>
+    <div class="page-header">
+      <div>
+        <h1>信息列表</h1>
+        <p class="subtitle">浏览校园内的二手商品与服务信息</p>
+      </div>
+      <el-input
+        v-model="searchKeyword"
+        placeholder="搜索商品..."
+        :prefix-icon="Search"
+        clearable
+        class="search-input"
+      />
+    </div>
 
-    <ul class="item-list">
-      <li v-for="item in items" :key="item.id" class="item-card" @click="goDetail(item.id)">
-        <div class="item-header">
-          <span class="item-title">{{ item.title }}</span>
-          <span class="item-price">¥{{ item.price }}</span>
-        </div>
-        <p class="item-desc">{{ item.desc }}</p>
-        <span class="item-link">查看详情 →</span>
-      </li>
-    </ul>
+    <div v-if="filteredItems.length === 0" class="empty-state">
+      <el-empty description="未找到匹配的商品" />
+    </div>
+
+    <el-row v-else :gutter="16">
+      <el-col v-for="item in filteredItems" :key="item.id" :xs="24" :sm="12" :md="8">
+        <el-card shadow="hover" class="item-card" @click="goDetail(item.id)">
+          <!-- 图片占位 -->
+          <div class="item-image">
+            <span class="image-icon">📦</span>
+          </div>
+          <div class="item-body">
+            <div class="item-header">
+              <h3 class="item-title">{{ item.title }}</h3>
+              <el-tag :type="item.tagType" size="small" effect="plain">{{ item.tag }}</el-tag>
+            </div>
+            <p class="item-desc">{{ item.desc }}</p>
+            <div class="item-footer">
+              <span class="item-price">¥{{ item.price }}</span>
+              <el-button type="primary" link :icon="Right">查看详情</el-button>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <style scoped>
 .list-page {
-  max-width: 680px;
+  max-width: 880px;
   margin: 0 auto;
 }
 
-.subtitle {
-  color: #666;
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 14px;
 }
 
-.item-list {
-  list-style: none;
-  padding: 0;
+.page-header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
 }
 
+.subtitle {
+  margin: 0;
+  color: #999;
+  font-size: 14px;
+}
+
+.search-input {
+  width: 260px;
+}
+
+/* 商品卡片 */
 .item-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 16px 20px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: box-shadow 0.2s;
+  transition: all 0.3s;
 }
 
 .item-card:hover {
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+}
+
+.item-card :deep(.el-card__body) {
+  padding: 0;
+}
+
+.item-image {
+  height: 140px;
+  background: linear-gradient(135deg, #e8f4fd 0%, #dce9f5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px 12px 0 0;
+}
+
+.image-icon {
+  font-size: 48px;
+  opacity: 0.6;
+}
+
+.item-body {
+  padding: 14px 16px 16px;
 }
 
 .item-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .item-title {
-  font-weight: 600;
+  margin: 0;
   font-size: 16px;
-}
-
-.item-price {
-  color: #e74c3c;
-  font-weight: 700;
-  font-size: 18px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  margin-right: 8px;
 }
 
 .item-desc {
-  color: #888;
-  font-size: 14px;
-  margin: 0 0 8px;
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: #999;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.item-link {
-  font-size: 13px;
-  color: #409eff;
+.item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f56c6c;
+}
+
+.empty-state {
+  padding: 60px 0;
 }
 </style>

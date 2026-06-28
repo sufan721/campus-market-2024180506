@@ -1,26 +1,43 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { UserFilled } from '@element-plus/icons-vue'
 
 interface Message {
   id: number
   from: string
+  avatar?: string
   content: string
   time: string
   unread: boolean
 }
 
 const messages = ref<Message[]>([
-  { id: 1, from: '张三', content: '你好，高等数学还在吗？', time: '10:30', unread: true },
-  { id: 2, from: '李四', content: '键盘能便宜点吗？60出吗？', time: '09:15', unread: true },
-  { id: 3, from: '系统通知', content: '你的商品"台灯 LED 护眼"已通过审核', time: '昨天', unread: false },
-  { id: 4, from: '王五', content: '好的，明天下午3点交易可以', time: '昨天', unread: false },
+  { id: 1, from: '张三', content: '你好，高等数学还在吗？我想买', time: '10分钟前', unread: true },
+  { id: 2, from: '李四', content: '键盘能便宜点吗？60出吗？', time: '30分钟前', unread: true },
+  { id: 3, from: '系统通知', content: '你的商品"台灯 LED 护眼"已通过审核', time: '2小时前', unread: false },
+  { id: 4, from: '王五', content: '好的，明天下午3点交易可以吗？', time: '昨天', unread: false },
+  { id: 5, from: '系统通知', content: '欢迎加入校园轻集市！请完善你的个人资料', time: '3天前', unread: false },
 ])
+
+const unreadCount = ref(messages.value.filter(m => m.unread).length)
+
+function openChat(msg: Message) {
+  msg.unread = false
+  unreadCount.value = messages.value.filter(m => m.unread).length
+}
 </script>
 
 <template>
   <div class="message-page">
-    <h1>消息</h1>
-    <p class="subtitle">查看买卖双方的沟通记录</p>
+    <div class="page-header">
+      <div>
+        <h1>消息</h1>
+        <p class="subtitle">查看买卖双方的沟通记录</p>
+      </div>
+      <el-badge :value="unreadCount" :hidden="unreadCount === 0" class="badge">
+        <el-button circle>💬</el-button>
+      </el-badge>
+    </div>
 
     <div class="message-list">
       <div
@@ -28,8 +45,16 @@ const messages = ref<Message[]>([
         :key="msg.id"
         class="message-item"
         :class="{ unread: msg.unread }"
+        @click="openChat(msg)"
       >
-        <div class="msg-avatar">{{ msg.from[0] }}</div>
+        <el-badge
+          :value="msg.unread ? '' : undefined"
+          :hidden="!msg.unread"
+          is-dot
+          class="avatar-wrap"
+        >
+          <el-avatar :icon="UserFilled" :size="44" />
+        </el-badge>
         <div class="msg-body">
           <div class="msg-header">
             <span class="msg-from">{{ msg.from }}</span>
@@ -37,7 +62,6 @@ const messages = ref<Message[]>([
           </div>
           <p class="msg-content">{{ msg.content }}</p>
         </div>
-        <span v-if="msg.unread" class="unread-dot"></span>
       </div>
     </div>
   </div>
@@ -45,29 +69,46 @@ const messages = ref<Message[]>([
 
 <style scoped>
 .message-page {
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
 }
 
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.page-header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
 .subtitle {
-  color: #666;
-  margin-bottom: 24px;
+  margin: 0;
+  color: #999;
+  font-size: 14px;
+}
+
+.badge {
+  flex-shrink: 0;
 }
 
 .message-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
 .message-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
-  padding: 14px 16px;
-  border-radius: 8px;
-  transition: background 0.15s;
+  padding: 16px 18px;
+  border-radius: 12px;
   cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 2px;
 }
 
 .message-item:hover {
@@ -75,21 +116,12 @@ const messages = ref<Message[]>([
 }
 
 .message-item.unread {
-  background: #f0f7ff;
+  background: #ecf5ff;
 }
 
-.msg-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #409eff;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
+.avatar-wrap {
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .msg-body {
@@ -100,33 +132,30 @@ const messages = ref<Message[]>([
 .msg-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 4px;
 }
 
 .msg-from {
   font-weight: 600;
   font-size: 15px;
+  color: #333;
 }
 
 .msg-time {
   font-size: 12px;
-  color: #999;
+  color: #bbb;
+  flex-shrink: 0;
+  margin-left: 12px;
 }
 
 .msg-content {
   margin: 0;
   font-size: 14px;
-  color: #666;
+  color: #888;
+  line-height: 1.5;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.unread-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #e74c3c;
-  flex-shrink: 0;
 }
 </style>

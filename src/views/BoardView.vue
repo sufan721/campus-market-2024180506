@@ -1,132 +1,165 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { TrendCharts, UserFilled, Goods, Coin } from '@element-plus/icons-vue'
 
-// 静态统计数据
-const stats = ref({
-  totalUsers: 1286,
-  totalItems: 567,
-  totalOrders: 2341,
-  activeToday: 89,
-})
+const stats = ref([
+  { label: '注册用户', value: 1286, icon: UserFilled, color: '#409eff', bg: '#ecf5ff' },
+  { label: '在售商品', value: 567, icon: Goods, color: '#67c23a', bg: '#f0f9eb' },
+  { label: '累计订单', value: 2341, icon: Coin, color: '#e6a23c', bg: '#fdf6ec' },
+  { label: '今日活跃', value: 89, icon: TrendCharts, color: '#f56c6c', bg: '#fef0f0' },
+])
 
 const weeklyData = ref([
-  { day: '周一', count: 34 },
-  { day: '周二', count: 42 },
-  { day: '周三', count: 28 },
-  { day: '周四', count: 51 },
-  { day: '周五', count: 67 },
-  { day: '周六', count: 45 },
-  { day: '周日', count: 22 },
+  { day: '一', count: 34 },
+  { day: '二', count: 42 },
+  { day: '三', count: 28 },
+  { day: '四', count: 51 },
+  { day: '五', count: 67 },
+  { day: '六', count: 45 },
+  { day: '日', count: 22 },
 ])
 
 const categories = ref([
-  { name: '二手教材', count: 124 },
-  { name: '电子产品', count: 98 },
-  { name: '生活用品', count: 87 },
-  { name: '代取服务', count: 56 },
-  { name: '其他', count: 202 },
+  { name: '二手教材', count: 124, color: '#409eff' },
+  { name: '电子产品', count: 98, color: '#67c23a' },
+  { name: '生活用品', count: 87, color: '#e6a23c' },
+  { name: '代取服务', count: 56, color: '#f56c6c' },
+  { name: '其他', count: 202, color: '#909399' },
 ])
 
-function maxCount() {
-  return Math.max(...weeklyData.value.map(d => d.count))
-}
+const maxWeekly = Math.max(...weeklyData.value.map(d => d.count))
+const maxCategory = Math.max(...categories.value.map(c => c.count))
 </script>
 
 <template>
   <div class="board-page">
-    <h1>数据看板</h1>
-    <p class="subtitle">校园市场运营概览</p>
-
-    <!-- 统计卡片 -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="stat-value">{{ stats.totalUsers }}</span>
-        <span class="stat-label">注册用户</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ stats.totalItems }}</span>
-        <span class="stat-label">在售商品</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ stats.totalOrders }}</span>
-        <span class="stat-label">累计订单</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ stats.activeToday }}</span>
-        <span class="stat-label">今日活跃</span>
-      </div>
+    <div class="page-header">
+      <h1>数据看板</h1>
+      <p class="subtitle">校园市场运营概览 · 实时数据</p>
     </div>
 
-    <!-- 周趋势图(简易柱状) -->
-    <div class="chart-section">
-      <h2>本周发布量</h2>
+    <!-- 统计卡片 -->
+    <el-row :gutter="16" class="stats-row">
+      <el-col v-for="s in stats" :key="s.label" :xs="12" :sm="6">
+        <el-card shadow="hover" class="stat-card">
+          <div class="stat-inner">
+            <div class="stat-icon" :style="{ background: s.bg }">
+              <el-icon :size="24" :color="s.color"><component :is="s.icon" /></el-icon>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">{{ s.value }}</span>
+              <span class="stat-label">{{ s.label }}</span>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- 柱状图 -->
+    <el-card shadow="never" class="chart-card">
+      <template #header>
+        <span class="card-title">📊 本周发布量</span>
+      </template>
       <div class="bar-chart">
-        <div
-          v-for="d in weeklyData"
-          :key="d.day"
-          class="bar-col"
-        >
+        <div v-for="d in weeklyData" :key="d.day" class="bar-col">
           <span class="bar-value">{{ d.count }}</span>
           <div
             class="bar"
-            :style="{ height: (d.count / maxCount() * 140) + 'px' }"
+            :style="{
+              height: (d.count / maxWeekly * 140) + 'px',
+              background: d.count === maxWeekly
+                ? 'linear-gradient(180deg, #409eff, #66b1ff)'
+                : 'linear-gradient(180deg, #a0cfff, #c6e2ff)'
+            }"
           ></div>
           <span class="bar-label">{{ d.day }}</span>
         </div>
       </div>
-    </div>
+    </el-card>
 
-    <!-- 分类占比 -->
-    <div class="chart-section">
-      <h2>分类分布</h2>
+    <!-- 分类分布 -->
+    <el-card shadow="never" class="chart-card">
+      <template #header>
+        <span class="card-title">📂 分类分布</span>
+      </template>
       <div class="category-list">
         <div v-for="cat in categories" :key="cat.name" class="category-row">
           <span class="cat-name">{{ cat.name }}</span>
-          <div class="cat-bar-track">
-            <div
-              class="cat-bar-fill"
-              :style="{ width: (cat.count / 202 * 100) + '%' }"
-            ></div>
-          </div>
+          <el-progress
+            :percentage="Math.round(cat.count / maxCategory * 100)"
+            :color="cat.color"
+            :stroke-width="14"
+            :show-text="false"
+            style="flex:1;margin:0 12px;"
+          />
           <span class="cat-count">{{ cat.count }}</span>
         </div>
       </div>
-    </div>
+    </el-card>
   </div>
 </template>
 
 <style scoped>
 .board-page {
-  max-width: 720px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
-.subtitle {
-  color: #666;
+.page-header {
   margin-bottom: 24px;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 32px;
+.page-header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.subtitle {
+  margin: 0;
+  color: #999;
+  font-size: 14px;
+}
+
+/* 统计卡片 */
+.stats-row {
+  margin-bottom: 20px;
 }
 
 .stat-card {
-  background: #f5f7fa;
-  border-radius: 10px;
-  padding: 20px 16px;
-  text-align: center;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-card :deep(.el-card__body) {
+  padding: 18px 16px;
+}
+
+.stat-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
 .stat-value {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   color: #333;
+  line-height: 1.2;
 }
 
 .stat-label {
@@ -134,14 +167,15 @@ function maxCount() {
   color: #999;
 }
 
-.chart-section {
-  margin-bottom: 28px;
+/* 图表卡片 */
+.chart-card {
+  border-radius: 12px;
+  margin-bottom: 20px;
 }
 
-.chart-section h2 {
-  font-size: 17px;
-  margin-bottom: 16px;
-  color: #444;
+.card-title {
+  font-weight: 600;
+  font-size: 16px;
 }
 
 /* 柱状图 */
@@ -150,46 +184,46 @@ function maxCount() {
   justify-content: space-between;
   align-items: flex-end;
   height: 200px;
-  padding: 0 8px;
+  padding: 0 12px;
 }
 
 .bar-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   flex: 1;
 }
 
 .bar-value {
   font-size: 12px;
-  color: #888;
+  color: #999;
+  font-weight: 600;
 }
 
 .bar {
-  width: 28px;
-  background: linear-gradient(180deg, #409eff, #6bb5ff);
-  border-radius: 4px 4px 0 0;
+  width: 32px;
+  border-radius: 6px 6px 0 0;
   min-height: 4px;
-  transition: height 0.4s;
+  transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .bar-label {
-  font-size: 12px;
+  font-size: 13px;
   color: #999;
+  font-weight: 500;
 }
 
 /* 分类列表 */
 .category-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .category-row {
   display: flex;
   align-items: center;
-  gap: 12px;
 }
 
 .cat-name {
@@ -197,21 +231,7 @@ function maxCount() {
   font-size: 14px;
   color: #555;
   text-align: right;
-}
-
-.cat-bar-track {
-  flex: 1;
-  height: 18px;
-  background: #f0f0f0;
-  border-radius: 9px;
-  overflow: hidden;
-}
-
-.cat-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #409eff, #6bb5ff);
-  border-radius: 9px;
-  transition: width 0.4s;
+  font-weight: 500;
 }
 
 .cat-count {
@@ -219,5 +239,6 @@ function maxCount() {
   font-weight: 600;
   color: #333;
   width: 40px;
+  text-align: left;
 }
 </style>
