@@ -89,8 +89,7 @@ function handleContact() {
 
 <style scoped>
 .detail-page {
-  max-width: 760px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .back-header {

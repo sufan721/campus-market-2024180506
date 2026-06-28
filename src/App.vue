@@ -41,16 +41,30 @@ function onNavSelect(index: string) {
 
 <template>
   <el-container class="app-container">
-    <!-- 顶部标题栏 -->
-    <el-header class="app-header" height="auto">
+    <!-- 顶部标题栏（浅绿色，含导航） -->
+    <el-header class="app-header">
       <div class="header-content">
-        <div class="brand">
+        <!-- 品牌 -->
+        <div class="brand" @click="$router.push('/home')">
           <span class="brand-icon">🏪</span>
-          <div class="brand-text">
-            <h1 class="brand-title">校园轻集市</h1>
-            <p class="brand-subtitle">AI 辅助前端工程实践种子项目</p>
-          </div>
+          <h1 class="brand-title">校园轻集市</h1>
         </div>
+
+        <!-- 桌面端导航 — 内嵌在 header 中 -->
+        <el-menu
+          :default-active="activeIndex"
+          mode="horizontal"
+          :ellipsis="false"
+          router
+          class="header-nav desktop-nav"
+          @select="(index: string) => activeIndex = index"
+        >
+          <el-menu-item v-for="item in navItems" :key="item.index" :index="item.index">
+            <el-icon><component :is="item.icon" /></el-icon>
+            <span>{{ item.label }}</span>
+          </el-menu-item>
+        </el-menu>
+
         <!-- 移动端汉堡按钮 -->
         <el-button
           class="hamburger-btn"
@@ -60,23 +74,6 @@ function onNavSelect(index: string) {
         />
       </div>
     </el-header>
-
-    <!-- 桌面端水平导航 -->
-    <div class="nav-wrapper desktop-nav">
-      <el-menu
-        :default-active="activeIndex"
-        mode="horizontal"
-        :ellipsis="false"
-        router
-        class="app-nav"
-        @select="(index: string) => activeIndex = index"
-      >
-        <el-menu-item v-for="item in navItems" :key="item.index" :index="item.index">
-          <el-icon><component :is="item.icon" /></el-icon>
-          <span>{{ item.label }}</span>
-        </el-menu-item>
-      </el-menu>
-    </div>
 
     <!-- 移动端底部导航栏 -->
     <div class="mobile-bottom-nav">
@@ -156,79 +153,85 @@ body {
   flex-direction: column;
 }
 
-/* ========== 顶部 ========== */
+/* ========== 顶部（浅灰色） ========== */
 .app-header {
-  background: linear-gradient(135deg, #409eff 0%, #337ecc 50%, #2c6fba 100%);
+  --header-height: 52px;
+  height: var(--header-height);
+  background: #f0f1f3;
   padding: 0;
-}
-
-.header-content {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 18px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.brand-icon {
-  font-size: 34px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-  flex-shrink: 0;
-}
-
-.brand-title {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 2px;
-}
-
-.brand-subtitle {
-  margin: 2px 0 0;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-/* 汉堡按钮 — 默认隐藏，移动端显示 */
-.hamburger-btn {
-  display: none;
-  background: rgba(255, 255, 255, 0.15) !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
-  color: #fff !important;
-}
-
-/* ========== 桌面端导航 ========== */
-.nav-wrapper {
-  background: #fff;
-  border-bottom: 1px solid #e8e8e8;
   position: sticky;
   top: 0;
   z-index: 100;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.app-nav {
-  max-width: 900px;
-  margin: 0 auto;
+.header-content {
+  width: 100%;
+  height: 100%;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.brand-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* 桌面端导航 — 内嵌在 header */
+.header-nav {
+  margin-left: auto;
+  background: transparent !important;
   border-bottom: none !important;
+  height: var(--header-height);
 }
 
-.app-nav .el-menu-item {
-  font-size: 15px;
+.header-nav :deep(.el-menu-item) {
+  height: var(--header-height);
+  line-height: var(--header-height);
+  font-size: 14px;
   font-weight: 500;
+  color: #555;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
 }
 
-.app-nav .el-menu-item.is-active {
-  color: #409eff;
-  border-bottom-color: #409eff;
+.header-nav :deep(.el-menu-item:hover) {
+  color: #333 !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+.header-nav :deep(.el-menu-item.is-active) {
+  color: #222 !important;
+  border-bottom-color: #666 !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* 汉堡按钮 — 默认隐藏，移动端显示 */
+.hamburger-btn {
+  display: none;
+  margin-left: auto;
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #555 !important;
 }
 
 /* ========== 移动端底部导航 ========== */
@@ -259,7 +262,7 @@ body {
 }
 
 .bottom-nav-item.active {
-  color: #409eff;
+  color: #555;
 }
 
 /* ========== 抽屉菜单 ========== */
@@ -267,16 +270,16 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 20px 20px 12px;
-  background: linear-gradient(135deg, #409eff, #337ecc);
-  color: #fff;
-  font-size: 18px;
+  padding: 18px 20px 12px;
+  background: #f0f1f3;
+  color: #333;
+  font-size: 17px;
   font-weight: 700;
   margin-bottom: 8px;
 }
 
 .drawer-icon {
-  font-size: 28px;
+  font-size: 26px;
 }
 
 .drawer-menu {
@@ -285,9 +288,7 @@ body {
 
 /* ========== 主内容区 ========== */
 .app-main {
-  max-width: 900px;
   width: 100%;
-  margin: 0 auto;
   padding: 28px 24px 40px;
   flex: 1;
 }
@@ -322,21 +323,20 @@ body {
 
 /* ≤ 768px: 平板 / 手机横屏 */
 @media (max-width: 768px) {
+  .app-header {
+    --header-height: 48px;
+  }
+
   .header-content {
-    padding: 14px 16px;
+    padding: 0 16px;
   }
 
   .brand-icon {
-    font-size: 28px;
+    font-size: 22px;
   }
 
   .brand-title {
-    font-size: 20px;
-    letter-spacing: 1px;
-  }
-
-  .brand-subtitle {
-    font-size: 11px;
+    font-size: 17px;
   }
 
   /* 显示汉堡按钮 */
@@ -366,16 +366,20 @@ body {
 
 /* ≤ 480px: 小屏手机 */
 @media (max-width: 480px) {
+  .app-header {
+    --header-height: 44px;
+  }
+
+  .header-content {
+    padding: 0 12px;
+  }
+
   .brand-icon {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .brand-title {
-    font-size: 18px;
-  }
-
-  .brand-subtitle {
-    display: none;
+    font-size: 15px;
   }
 
   .app-main {

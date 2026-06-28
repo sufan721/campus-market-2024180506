@@ -134,8 +134,7 @@ function submitPublish() {
 
 <style scoped>
 .publish-page {
-  max-width: 640px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .page-header {

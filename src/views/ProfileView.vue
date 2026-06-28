@@ -70,8 +70,7 @@ const menus = ref([
 
 <style scoped>
 .profile-page {
-  max-width: 560px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .page-title {

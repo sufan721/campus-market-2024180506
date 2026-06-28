@@ -101,8 +101,7 @@ const maxCategory = Math.max(...categories.value.map(c => c.count))
 
 <style scoped>
 .board-page {
-  max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .page-header {

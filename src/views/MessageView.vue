@@ -69,8 +69,7 @@ function openChat(msg: Message) {
 
 <style scoped>
 .message-page {
-  max-width: 640px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .page-header {

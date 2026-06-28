@@ -82,8 +82,7 @@ function goDetail(id: number) {
 
 <style scoped>
 .list-page {
-  max-width: 880px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .page-header {
