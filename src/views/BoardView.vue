@@ -241,4 +241,112 @@ const maxCategory = Math.max(...categories.value.map(c => c.count))
   width: 40px;
   text-align: left;
 }
+
+/* ========== RESPONSIVE ========== */
+
+/* ≤ 768px */
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  .stat-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .stat-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+
+  .bar-chart {
+    height: 160px;
+    padding: 0 4px;
+  }
+
+  .bar {
+    width: 24px;
+    border-radius: 4px 4px 0 0;
+  }
+
+  .bar-value {
+    font-size: 10px;
+  }
+
+  .bar-label {
+    font-size: 11px;
+  }
+
+  .cat-name {
+    width: 60px;
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .cat-count {
+    width: 32px;
+    font-size: 13px;
+  }
+}
+
+/* ≤ 480px */
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+
+  .stat-card :deep(.el-card__body) {
+    padding: 14px 10px;
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+
+  .bar-chart {
+    height: 130px;
+  }
+
+  .bar {
+    width: 18px;
+  }
+
+  .bar-value {
+    font-size: 9px;
+  }
+
+  .bar-label {
+    font-size: 10px;
+  }
+
+  .category-row {
+    flex-wrap: wrap;
+  }
+
+  .cat-name {
+    width: 100%;
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+}
 </style>

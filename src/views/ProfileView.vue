@@ -24,7 +24,7 @@ const menus = ref([
 
 <template>
   <div class="profile-page">
-    <h1 style="font-size:22px;margin:0 0 20px;">个人中心</h1>
+    <h1 class="page-title">个人中心</h1>
 
     <!-- 用户信息卡片 -->
     <el-card shadow="hover" class="user-card">
@@ -40,7 +40,7 @@ const menus = ref([
 
     <!-- 统计 -->
     <el-row :gutter="14" class="stats-row">
-      <el-col :span="8" v-for="s in stats" :key="s.label">
+      <el-col :xs="8" v-for="s in stats" :key="s.label">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
             <span class="stat-num" :style="{ color: s.color }">{{ s.num }}</span>
@@ -72,6 +72,11 @@ const menus = ref([
 .profile-page {
   max-width: 560px;
   margin: 0 auto;
+}
+
+.page-title {
+  font-size: 22px;
+  margin: 0 0 20px;
 }
 
 /* 用户卡片 */
@@ -171,5 +176,75 @@ const menus = ref([
 .menu-arrow {
   color: #ccc;
   font-size: 14px;
+}
+
+/* ========== RESPONSIVE ========== */
+
+/* ≤ 768px */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 20px;
+  }
+
+  .user-card :deep(.el-card__body) {
+    padding: 18px;
+  }
+
+  .user-avatar {
+    --size: 56px;
+    width: 56px;
+    height: 56px;
+  }
+
+  .user-meta h2 {
+    font-size: 18px;
+  }
+
+  .stat-num {
+    font-size: 24px;
+  }
+
+  .menu-item {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+}
+
+/* ≤ 480px */
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  .user-card :deep(.el-card__body) {
+    padding: 14px;
+  }
+
+  .user-info {
+    gap: 14px;
+  }
+
+  .user-avatar {
+    --size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .user-meta h2 {
+    font-size: 16px;
+  }
+
+  .user-meta p {
+    font-size: 13px;
+  }
+
+  .stat-num {
+    font-size: 22px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
 }
 </style>

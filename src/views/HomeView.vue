@@ -157,13 +157,76 @@ const features = ref([
   color: #555;
 }
 
+/* ========== RESPONSIVE ========== */
+
+/* ≤ 768px */
 @media (max-width: 768px) {
+  .hero {
+    padding: 28px 16px 24px;
+    margin-bottom: 24px;
+    border-radius: 12px;
+  }
+
   .hero-title {
     font-size: 24px;
   }
+
+  .hero-desc {
+    font-size: 14px;
+    margin-bottom: 18px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .hero-actions .el-button {
+    width: 80%;
+  }
+
+  .feature-card :deep(.el-card__body) {
+    padding: 20px 14px;
+  }
+
+  .feature-icon-wrap {
+    width: 48px;
+    height: 48px;
+  }
+
+  .feature-title {
+    font-size: 15px;
+  }
+
   .quick-inner {
     flex-direction: column;
     gap: 14px;
+    text-align: center;
+  }
+
+  .quick-label {
+    font-size: 14px;
+  }
+}
+
+/* ≤ 480px */
+@media (max-width: 480px) {
+  .hero {
+    padding: 22px 12px 18px;
+  }
+
+  .hero-title {
+    font-size: 20px;
+  }
+
+  .hero-badge {
+    font-size: 11px;
+    padding: 3px 12px;
+  }
+
+  .hero-actions .el-button {
+    width: 100%;
   }
 }
 </style>

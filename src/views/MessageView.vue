@@ -158,4 +158,37 @@ function openChat(msg: Message) {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ========== RESPONSIVE ========== */
+
+/* ≤ 768px */
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  .message-item {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+
+  .msg-from {
+    font-size: 14px;
+  }
+
+  .msg-content {
+    font-size: 13px;
+  }
+}
+
+/* ≤ 480px */
+@media (max-width: 480px) {
+  .message-item {
+    padding: 12px 10px;
+  }
+
+  .msg-time {
+    display: none;
+  }
+}
 </style>

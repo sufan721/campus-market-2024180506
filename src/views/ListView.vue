@@ -186,4 +186,57 @@ function goDetail(id: number) {
 .empty-state {
   padding: 60px 0;
 }
+
+/* ========== RESPONSIVE ========== */
+
+/* ≤ 768px */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .item-image {
+    height: 120px;
+  }
+
+  .image-icon {
+    font-size: 40px;
+  }
+
+  .item-body {
+    padding: 12px 14px 14px;
+  }
+
+  .item-title {
+    font-size: 15px;
+  }
+
+  .item-price {
+    font-size: 18px;
+  }
+}
+
+/* ≤ 480px */
+@media (max-width: 480px) {
+  .item-image {
+    height: 100px;
+  }
+
+  .image-icon {
+    font-size: 36px;
+  }
+
+  .item-title {
+    font-size: 14px;
+  }
+}
 </style>

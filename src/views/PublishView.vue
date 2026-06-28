@@ -43,10 +43,6 @@ function submitPublish() {
     }
   })
 }
-
-function resetForm() {
-  formRef.value?.resetFields()
-}
 </script>
 
 <template>
@@ -76,7 +72,7 @@ function resetForm() {
         </el-form-item>
 
         <el-row :gutter="16">
-          <el-col :span="12">
+          <el-col :xs="24" :sm="12">
             <el-form-item label="价格 (¥)" prop="price">
               <el-input-number
                 v-model="form.price"
@@ -88,7 +84,7 @@ function resetForm() {
               />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :xs="24" :sm="12">
             <el-form-item label="分类" prop="category">
               <el-select v-model="form.category" placeholder="请选择分类" style="width: 100%">
                 <el-option label="二手教材" value="教材" />
@@ -164,5 +160,33 @@ function resetForm() {
 .upload-tip {
   color: #999;
   font-size: 12px;
+}
+
+/* ========== RESPONSIVE ========== */
+
+/* ≤ 768px */
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  .form-card :deep(.el-card__body) {
+    padding: 16px 12px;
+  }
+}
+
+/* ≤ 480px */
+@media (max-width: 480px) {
+  .page-header {
+    margin-bottom: 16px;
+  }
+
+  .page-header h1 {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
 }
 </style>

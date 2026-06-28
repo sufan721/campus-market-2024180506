@@ -121,11 +121,13 @@ function handleContact() {
   align-items: center;
   gap: 12px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 
 .title-row h1 {
   margin: 0;
   font-size: 26px;
+  word-break: break-all;
 }
 
 .price {
@@ -173,5 +175,72 @@ function handleContact() {
   display: flex;
   gap: 14px;
   margin-top: 24px;
+}
+
+/* ========== RESPONSIVE ========== */
+
+/* ≤ 768px */
+@media (max-width: 768px) {
+  .detail-image {
+    height: 180px;
+    border-radius: 12px;
+  }
+
+  .image-icon {
+    font-size: 56px;
+  }
+
+  .title-row h1 {
+    font-size: 22px;
+  }
+
+  .price {
+    font-size: 28px;
+  }
+
+  .desc {
+    font-size: 14px;
+  }
+
+  .detail-text {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .actions .el-button {
+    width: 100%;
+  }
+}
+
+/* ≤ 480px */
+@media (max-width: 480px) {
+  .detail-image {
+    height: 150px;
+  }
+
+  .image-icon {
+    font-size: 48px;
+  }
+
+  .title-row h1 {
+    font-size: 20px;
+  }
+
+  .price {
+    font-size: 24px;
+  }
+
+  .section-card :deep(.el-card__header) {
+    padding: 10px 14px;
+  }
+
+  .section-card :deep(.el-card__body) {
+    padding: 12px 14px;
+  }
 }
 </style>
