@@ -32,7 +32,7 @@ const filteredItems = computed(() => {
 })
 
 function goDetail(id: number) {
-  router.push({ name: 'Detail', params: { id } })
+  router.push({ name: 'Detail', params: { type: 'trade', id } })
 }
 </script>
 

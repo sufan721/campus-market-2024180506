@@ -19,6 +19,7 @@
         :tag="item.category"
         :location="item.location"
         :time="item.publishTime"
+        @click="goDetail(item.id)"
       >
         <template #footer>
           <strong>￥{{ item.price }}</strong>
@@ -31,9 +32,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import ItemCard from '../components/ItemCard.vue'
 import EmptyState from '../components/EmptyState.vue'
 import { getTrades, type TradeItem } from '../api/trade'
+
+const router = useRouter()
 
 const trades = ref<TradeItem[]>([])
 
@@ -41,6 +45,10 @@ onMounted(async () => {
   const res = await getTrades()
   trades.value = res.data
 })
+
+function goDetail(id: number) {
+  router.push({ name: 'Detail', params: { type: 'trade', id } })
+}
 </script>
 
 <style scoped>

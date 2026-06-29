@@ -1,25 +1,80 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { UserFilled, List, Star, Setting, InfoFilled, ArrowRight } from '@element-plus/icons-vue'
+import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import {
+  UserFilled, List, Star, Setting, InfoFilled, ArrowRight, Switch,
+} from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/user'
+import { getTradesByUser, type TradeItem } from '@/api/trade'
+import { getLostFoundsByUser, type LostFoundItem } from '@/api/lostFound'
+import { getGroupBuysByUser, type GroupBuyItem } from '@/api/groupBuy'
+import { getErrandsByUser, type ErrandItem } from '@/api/errand'
 
-const user = ref({
-  name: '未登录用户',
-  school: 'XX大学',
-  joinDate: '2026-06-01',
+const router = useRouter()
+const userStore = useUserStore()
+
+// 用户发布的所有物品
+const myTrades = ref<TradeItem[]>([])
+const myLostFounds = ref<LostFoundItem[]>([])
+const myGroupBuys = ref<GroupBuyItem[]>([])
+const myErrands = ref<ErrandItem[]>([])
+
+const loading = ref(false)
+
+// 统计数据
+const totalPublished = computed(
+  () => myTrades.value.length + myLostFounds.value.length + myGroupBuys.value.length + myErrands.value.length,
+)
+
+const stats = computed(() => [
+  { num: myTrades.value.length, label: '二手交易', color: '#409eff' },
+  { num: myLostFounds.value.length, label: '失物招领', color: '#67c23a' },
+  { num: myGroupBuys.value.length, label: '拼单搭子', color: '#e6a23c' },
+  { num: myErrands.value.length, label: '跑腿委托', color: '#f56c6c' },
+])
+
+// 合并所有发布（按时间排序后展示）
+interface MyItem {
+  id: number
+  title: string
+  type: string
+  category: string
+  time: string
+}
+
+const myItems = computed<MyItem[]>(() => {
+  const items: MyItem[] = [
+    ...myTrades.value.map(t => ({ id: t.id, title: t.title, type: '二手交易', category: t.category, time: t.publishTime })),
+    ...myLostFounds.value.map(l => ({ id: l.id, title: l.title, type: '失物招领', category: l.itemName, time: l.eventTime })),
+    ...myGroupBuys.value.map(g => ({ id: g.id, title: g.title, type: '拼单搭子', category: g.type, time: g.deadline })),
+    ...myErrands.value.map(e => ({ id: e.id, title: e.title, type: '跑腿委托', category: e.taskType, time: e.deadline })),
+  ]
+  items.sort((a, b) => b.time.localeCompare(a.time))
+  return items
 })
 
-const stats = ref([
-  { num: 3, label: '已发布', icon: List, color: '#409eff' },
-  { num: 1, label: '已售出', icon: Star, color: '#67c23a' },
-  { num: 2, label: '已购买', icon: List, color: '#e6a23c' },
-])
+async function loadMyItems() {
+  loading.value = true
+  const uid = userStore.userId
+  try {
+    const [t, l, g, e] = await Promise.all([
+      getTradesByUser(uid),
+      getLostFoundsByUser(uid),
+      getGroupBuysByUser(uid),
+      getErrandsByUser(uid),
+    ])
+    myTrades.value = t.data
+    myLostFounds.value = l.data
+    myGroupBuys.value = g.data
+    myErrands.value = e.data
+  } catch {
+    // Mock 服务未启动时静默失败
+  } finally {
+    loading.value = false
+  }
+}
 
-const menus = ref([
-  { icon: List, label: '我的发布', action: '' },
-  { icon: Star, label: '我的收藏', action: '' },
-  { icon: Setting, label: '设置', action: '' },
-  { icon: InfoFilled, label: '关于', action: '' },
-])
+onMounted(loadMyItems)
 </script>
 
 <template>
@@ -31,16 +86,16 @@ const menus = ref([
       <div class="user-info">
         <el-avatar :icon="UserFilled" :size="72" class="user-avatar" />
         <div class="user-meta">
-          <h2>{{ user.name }}</h2>
-          <p>{{ user.school }}</p>
-          <el-tag size="small" effect="plain">加入于 {{ user.joinDate }}</el-tag>
+          <h2>{{ userStore.currentUser.name }}</h2>
+          <p>{{ userStore.currentUser.department }} · {{ userStore.currentUser.grade }}</p>
+          <el-tag size="small" effect="plain">加入于 {{ userStore.currentUser.joinDate }}</el-tag>
         </div>
       </div>
     </el-card>
 
-    <!-- 统计 -->
+    <!-- 发布统计 -->
     <el-row :gutter="14" class="stats-row">
-      <el-col :xs="8" v-for="s in stats" :key="s.label">
+      <el-col :xs="6" v-for="s in stats" :key="s.label">
         <el-card shadow="hover" class="stat-card">
           <div class="stat-content">
             <span class="stat-num" :style="{ color: s.color }">{{ s.num }}</span>
@@ -50,19 +105,35 @@ const menus = ref([
       </el-col>
     </el-row>
 
-    <!-- 菜单 -->
+    <!-- 我的发布列表 -->
     <el-card shadow="never" class="menu-card">
+      <template #header>
+        <div class="card-header">
+          <span class="card-title">📋 我的发布（{{ totalPublished }}）</span>
+          <el-button type="primary" link @click="loadMyItems" :loading="loading">
+            刷新
+          </el-button>
+        </div>
+      </template>
+
+      <div v-if="totalPublished === 0 && !loading" class="empty-hint">
+        暂无发布内容，去<a href="javascript:void(0)" @click="$router.push('/publish')">发布</a>第一条吧！
+      </div>
+
       <div
-        v-for="(m, i) in menus"
-        :key="m.label"
+        v-for="(item, i) in myItems"
+        :key="`${item.type}-${item.id}`"
         class="menu-item"
-        :class="{ 'menu-item-last': i === menus.length - 1 }"
+        :class="{ 'menu-item-last': i === myItems.length - 1 }"
       >
         <div class="menu-left">
-          <el-icon :size="18"><component :is="m.icon" /></el-icon>
-          <span>{{ m.label }}</span>
+          <span class="item-type-tag" :class="`tag-${item.type}`">{{ item.type }}</span>
+          <span class="item-title">{{ item.title }}</span>
         </div>
-        <el-icon class="menu-arrow"><ArrowRight /></el-icon>
+        <div class="menu-right">
+          <span class="item-time">{{ item.time }}</span>
+          <el-icon class="menu-arrow"><ArrowRight /></el-icon>
+        </div>
       </div>
     </el-card>
   </div>
@@ -71,6 +142,8 @@ const menus = ref([
 <style scoped>
 .profile-page {
   width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .page-title {
@@ -120,24 +193,27 @@ const menus = ref([
   text-align: center;
 }
 
+.stat-card :deep(.el-card__body) {
+  padding: 14px 8px;
+}
+
 .stat-content {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 4px 0;
 }
 
 .stat-num {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
 }
 
 .stat-label {
-  font-size: 13px;
+  font-size: 12px;
   color: #999;
 }
 
-/* 菜单 */
+/* 我的发布列表 */
 .menu-card {
   border-radius: 14px;
 }
@@ -146,20 +222,40 @@ const menus = ref([
   padding: 0;
 }
 
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.empty-hint {
+  padding: 40px 20px;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+}
+
+.empty-hint a {
+  color: #409eff;
+  text-decoration: none;
+}
+
 .menu-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  padding: 14px 20px;
   border-bottom: 1px solid #f5f5f5;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 15px;
+  transition: background 0.2s;
 }
 
 .menu-item:hover {
   background: #f5f7fa;
-  color: #409eff;
 }
 
 .menu-item-last {
@@ -169,7 +265,42 @@ const menus = ref([
 .menu-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.item-type-tag {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tag-二手交易 { background: #ecf5ff; color: #409eff; }
+.tag-失物招领 { background: #f0f9eb; color: #67c23a; }
+.tag-拼单搭子 { background: #fdf6ec; color: #e6a23c; }
+.tag-跑腿委托 { background: #fef0f0; color: #f56c6c; }
+
+.item-title {
+  font-size: 14px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.item-time {
+  font-size: 12px;
+  color: #bbb;
 }
 
 .menu-arrow {
@@ -178,8 +309,6 @@ const menus = ref([
 }
 
 /* ========== RESPONSIVE ========== */
-
-/* ≤ 768px */
 @media (max-width: 768px) {
   .page-title {
     font-size: 20px;
@@ -190,7 +319,6 @@ const menus = ref([
   }
 
   .user-avatar {
-    --size: 56px;
     width: 56px;
     height: 56px;
   }
@@ -200,16 +328,18 @@ const menus = ref([
   }
 
   .stat-num {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .menu-item {
-    padding: 14px 16px;
-    font-size: 14px;
+    padding: 12px 14px;
+  }
+
+  .item-title {
+    font-size: 13px;
   }
 }
 
-/* ≤ 480px */
 @media (max-width: 480px) {
   .page-title {
     font-size: 18px;
@@ -225,7 +355,6 @@ const menus = ref([
   }
 
   .user-avatar {
-    --size: 48px;
     width: 48px;
     height: 48px;
   }
@@ -239,7 +368,7 @@ const menus = ref([
   }
 
   .stat-num {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .stat-label {

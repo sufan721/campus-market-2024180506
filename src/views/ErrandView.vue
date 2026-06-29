@@ -19,6 +19,7 @@
         :tag="item.taskType"
         :location="item.from + ' → ' + item.to"
         :time="item.deadline"
+        @click="goDetail(item.id)"
       >
         <template #footer>
           <strong class="reward">💰 ￥{{ item.reward }}</strong>
@@ -31,9 +32,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import ItemCard from '../components/ItemCard.vue'
 import EmptyState from '../components/EmptyState.vue'
 import { getErrands, type ErrandItem } from '../api/errand'
+
+const router = useRouter()
 
 const errands = ref<ErrandItem[]>([])
 
@@ -41,6 +45,10 @@ onMounted(async () => {
   const res = await getErrands()
   errands.value = res.data
 })
+
+function goDetail(id: number) {
+  router.push({ name: 'Detail', params: { type: 'errand', id } })
+}
 </script>
 
 <style scoped>

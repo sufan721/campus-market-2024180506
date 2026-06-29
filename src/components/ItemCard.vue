@@ -1,5 +1,5 @@
 <template>
-  <article class="item-card">
+  <article class="item-card" @click="$emit('click')">
     <div class="item-card__header">
       <h3>{{ title }}</h3>
       <span v-if="tag" class="tag">{{ tag }}</span>
@@ -26,6 +26,10 @@ defineProps<{
   location?: string
   time?: string
 }>()
+
+defineEmits<{
+  click: []
+}>()
 </script>
 
 <style scoped>
@@ -35,6 +39,7 @@ defineProps<{
   background: #fff;
   border: 1px solid #e5e7eb;
   transition: box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
 }
 
 .item-card:hover {

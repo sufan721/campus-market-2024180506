@@ -1,7 +1,30 @@
 {
+  "users": [
+    {
+      "id": "1",
+      "name": "张三",
+      "avatar": "",
+      "school": "XX大学",
+      "department": "软件工程",
+      "grade": "2023级",
+      "joinDate": "2026-03-01",
+      "contact": "QQ：111222333"
+    },
+    {
+      "id": "2",
+      "name": "李四",
+      "avatar": "",
+      "school": "XX大学",
+      "department": "数学学院",
+      "grade": "2022级",
+      "joinDate": "2026-03-15",
+      "contact": "站内消息联系"
+    }
+  ],
   "trades": [
     {
-      "id": 1,
+      "id": "1",
+      "userId": 1,
       "title": "九成新机械键盘",
       "category": "数码配件",
       "price": 89,
@@ -14,7 +37,8 @@
       "description": "键盘使用正常，因更换设备转让。"
     },
     {
-      "id": 2,
+      "id": "2",
+      "userId": 2,
       "title": "高等数学教材",
       "category": "教材资料",
       "price": 18,
@@ -27,7 +51,8 @@
       "description": "教材有少量笔记，不影响使用。"
     },
     {
-      "id": 3,
+      "id": "3",
+      "userId": 2,
       "title": "二手自行车 26寸",
       "category": "出行工具",
       "price": 120,
@@ -40,7 +65,8 @@
       "description": "山地车，变速正常，送锁和打气筒。"
     },
     {
-      "id": 4,
+      "id": "4",
+      "userId": 1,
       "title": "宿舍用小冰箱",
       "category": "家用电器",
       "price": 200,
@@ -53,7 +79,8 @@
       "description": "小型冰箱，适合宿舍使用，制冷效果良好。"
     },
     {
-      "id": 5,
+      "id": "5",
+      "userId": 2,
       "title": "考研英语真题集 2024",
       "category": "教材资料",
       "price": 20,
@@ -66,7 +93,8 @@
       "description": "2024版考研英语真题，含详细解析册，仅翻阅过。"
     },
     {
-      "id": 6,
+      "id": "6",
+      "userId": 1,
       "title": "台灯 LED 护眼",
       "category": "生活用品",
       "price": 25,
@@ -81,7 +109,8 @@
   ],
   "lostFounds": [
     {
-      "id": 1,
+      "id": "1",
+      "userId": 1,
       "title": "寻找黑色校园卡",
       "type": "lost",
       "itemName": "校园卡",
@@ -92,7 +121,8 @@
       "description": "校园卡卡套为黑色，内有学生证。"
     },
     {
-      "id": 2,
+      "id": "2",
+      "userId": 2,
       "title": "拾到蓝色雨伞",
       "type": "found",
       "itemName": "雨伞",
@@ -103,7 +133,8 @@
       "description": "雨伞放在 A 区一楼值班室。"
     },
     {
-      "id": 3,
+      "id": "3",
+      "userId": 1,
       "title": "丢失银色 U 盘",
       "type": "lost",
       "itemName": "U 盘",
@@ -114,7 +145,8 @@
       "description": "银色金属外壳，32GB，挂有红色小绳，内有课程作业。"
     },
     {
-      "id": 4,
+      "id": "4",
+      "userId": 2,
       "title": "拾到一副眼镜",
       "type": "found",
       "itemName": "眼镜",
@@ -125,7 +157,8 @@
       "description": "黑色半框眼镜，放在食堂失物招领处。"
     },
     {
-      "id": 5,
+      "id": "5",
+      "userId": 2,
       "title": "丢失蓝牙耳机仓",
       "type": "lost",
       "itemName": "蓝牙耳机仓",
@@ -136,7 +169,8 @@
       "description": "白色 AirPods 充电仓（不含耳机），可能有同学跑步时掉落。"
     },
     {
-      "id": 6,
+      "id": "6",
+      "userId": 1,
       "title": "拾到一串钥匙",
       "type": "found",
       "itemName": "钥匙",
@@ -149,7 +183,8 @@
   ],
   "groupBuys": [
     {
-      "id": 1,
+      "id": "1",
+      "userId": 1,
       "title": "周五晚火锅拼单",
       "type": "拼餐",
       "targetCount": 6,
@@ -161,7 +196,8 @@
       "description": "AA 制，人数够后统一预约。"
     },
     {
-      "id": 2,
+      "id": "2",
+      "userId": 2,
       "title": "四六级资料团购",
       "type": "学习资料",
       "targetCount": 10,
@@ -173,7 +209,8 @@
       "description": "达到人数后统一下单。"
     },
     {
-      "id": 3,
+      "id": "3",
+      "userId": 2,
       "title": "周末羽毛球局拼场地",
       "type": "运动",
       "targetCount": 4,
@@ -185,7 +222,8 @@
       "description": "拼场地费用，每人约15元，自带球拍。"
     },
     {
-      "id": 4,
+      "id": "4",
+      "userId": 1,
       "title": "打印店团购优惠",
       "type": "学习资料",
       "targetCount": 20,
@@ -197,7 +235,8 @@
       "description": "满20人打印费打八折，期末复习资料集中打印。"
     },
     {
-      "id": 5,
+      "id": "5",
+      "userId": 2,
       "title": "奶茶拼单满减",
       "type": "拼餐",
       "targetCount": 8,
@@ -209,7 +248,8 @@
       "description": "满8杯享七折，一起下单更划算。"
     },
     {
-      "id": 6,
+      "id": "6",
+      "userId": 1,
       "title": "二手教材批量采购",
       "type": "学习资料",
       "targetCount": 5,
@@ -223,7 +263,8 @@
   ],
   "errands": [
     {
-      "id": 1,
+      "id": "1",
+      "userId": 2,
       "title": "帮取快递到宿舍楼下",
       "taskType": "取快递",
       "reward": 3,
@@ -235,7 +276,8 @@
       "description": "快递较轻，送到宿舍楼下即可。"
     },
     {
-      "id": 2,
+      "id": "2",
+      "userId": 1,
       "title": "帮买一份晚餐",
       "taskType": "代买",
       "reward": 5,
@@ -247,7 +289,8 @@
       "description": "需要在 18:30 前送到。"
     },
     {
-      "id": 3,
+      "id": "3",
+      "userId": 1,
       "title": "帮忙搬宿舍行李",
       "taskType": "搬运",
       "reward": 15,
@@ -259,7 +302,8 @@
       "description": "搬宿舍，需要帮忙搬两个行李箱和若干纸箱，有电梯。"
     },
     {
-      "id": 4,
+      "id": "4",
+      "userId": 2,
       "title": "代还图书馆书籍",
       "taskType": "代办",
       "reward": 2,
@@ -271,7 +315,8 @@
       "description": "代还两本书到图书馆，书已准备好，直接拿去还即可。"
     },
     {
-      "id": 5,
+      "id": "5",
+      "userId": 1,
       "title": "帮忙打印论文",
       "taskType": "代办",
       "reward": 3,
@@ -283,7 +328,8 @@
       "description": "打印一份论文（约80页），双面打印并装订。"
     },
     {
-      "id": 6,
+      "id": "6",
+      "userId": 2,
       "title": "代购生活用品",
       "taskType": "代买",
       "reward": 6,
@@ -294,5 +340,6 @@
       "status": "open",
       "description": "代购洗发水、牙膏等日用品，清单已列好，约50元。"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

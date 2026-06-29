@@ -1,89 +1,294 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, User } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { getTradeById, type TradeItem } from '../api/trade'
+import { getLostFoundById, type LostFoundItem } from '../api/lostFound'
+import { getGroupBuyById, type GroupBuyItem } from '../api/groupBuy'
+import { getErrandById, type ErrandItem } from '../api/errand'
 
 const route = useRoute()
 const router = useRouter()
 
+type ItemType = 'trade' | 'lostfound' | 'groupbuy' | 'errand'
+
+const itemType = computed(() => route.params.type as ItemType)
 const itemId = computed(() => Number(route.params.id))
 
-const data: Record<number, {
-  title: string; price: number; desc: string; detail: string
-  seller: string; tag: string; tagType: 'success' | 'warning' | 'info' | 'danger'
-}> = {
-  1: { title: '二手教材-高等数学', price: 15, desc: '九成新，几乎无笔记', detail: '同济大学第七版，上下册齐全，书角无折痕，内部有少量铅笔标注可擦除。适合大一新生使用。', seller: '张三', tag: '教材', tagType: 'info' },
-  2: { title: '机械键盘 IKBC C87', price: 80, desc: '樱桃红轴，使用一年', detail: 'IKBC C87 机械键盘，Cherry MX Red 红轴，87键紧凑布局，PBT键帽不打油。包装盒配件齐全，购买于京东自营。', seller: '李四', tag: '数码', tagType: 'success' },
-  3: { title: '台灯 LED 护眼', price: 25, desc: '三档调光，配件齐全', detail: '小米LED台灯1S，支持三档色温调节，无频闪，支持APP控制，灯臂可多角度调节。', seller: '王五', tag: '生活', tagType: 'warning' },
-  4: { title: '代取快递服务', price: 3, desc: '校内驿站代取，当日送达', detail: '驿站排队久？我帮你取！校内所有驿站均可代取，送到宿舍楼下，今日下午统一配送。', seller: '赵六', tag: '服务', tagType: 'danger' },
-  5: { title: '考研英语真题集', price: 20, desc: '2024版，含解析册', detail: '张剑黄皮书 2024 考研英语一历年真题及详解，包含近10年真题，解析详尽，适合考研备考。', seller: '孙七', tag: '教材', tagType: 'info' },
-}
+const trade = ref<TradeItem | null>(null)
+const lostFound = ref<LostFoundItem | null>(null)
+const groupBuy = ref<GroupBuyItem | null>(null)
+const errand = ref<ErrandItem | null>(null)
 
-const info = ref(data[itemId.value] || null)
+const loading = ref(true)
+const notFound = ref(false)
+
+const typeLabel = computed(() => {
+  const map: Record<ItemType, string> = {
+    trade: '二手交易',
+    lostfound: '失物招领',
+    groupbuy: '拼单搭子',
+    errand: '跑腿委托',
+  }
+  return map[itemType.value] || '详情'
+})
+
+onMounted(async () => {
+  try {
+    switch (itemType.value) {
+      case 'trade': {
+        const res = await getTradeById(itemId.value)
+        trade.value = res.data
+        break
+      }
+      case 'lostfound': {
+        const res = await getLostFoundById(itemId.value)
+        lostFound.value = res.data
+        break
+      }
+      case 'groupbuy': {
+        const res = await getGroupBuyById(itemId.value)
+        groupBuy.value = res.data
+        break
+      }
+      case 'errand': {
+        const res = await getErrandById(itemId.value)
+        errand.value = res.data
+        break
+      }
+    }
+  } catch {
+    notFound.value = true
+  } finally {
+    loading.value = false
+  }
+})
 
 function goBack() {
   router.back()
 }
 
-function handleContact() {
-  ElMessage.success(`已向卖家「${info.value?.seller}」发送消息`)
+function handleContact(contactName?: string) {
+  ElMessage.success(`已向「${contactName || '发布者'}」发送消息`)
 }
 </script>
 
 <template>
   <div class="detail-page">
     <!-- 返回 -->
-    <el-page-header @back="goBack" title="返回列表" class="back-header" />
+    <el-page-header @back="goBack" :title="`返回${typeLabel}列表`" class="back-header" />
 
-    <div v-if="info" class="detail-content">
-      <!-- 图片占位 -->
+    <!-- 加载中 -->
+    <div v-if="loading" class="loading-wrap">
+      <el-skeleton :rows="8" animated />
+    </div>
+
+    <!-- 未找到 -->
+    <el-empty v-else-if="notFound" :description="`ID: ${itemId} 的信息未找到`" />
+
+    <!-- ==================== 二手交易详情 ==================== -->
+    <div v-else-if="itemType === 'trade' && trade" class="detail-content">
       <div class="detail-image">
         <span class="image-icon">📦</span>
       </div>
 
-      <!-- 标题 & 价格 -->
       <div class="detail-header">
         <div class="title-row">
-          <h1>{{ info.title }}</h1>
-          <el-tag :type="info.tagType" effect="light">{{ info.tag }}</el-tag>
+          <h1>{{ trade.title }}</h1>
+          <el-tag type="success" effect="light">{{ trade.category }}</el-tag>
         </div>
-        <p class="price">¥{{ info.price }}</p>
-        <p class="desc">{{ info.desc }}</p>
+        <p class="price">¥{{ trade.price }}</p>
+        <p class="desc">{{ trade.description }}</p>
       </div>
 
-      <!-- 详细描述 -->
       <el-card shadow="never" class="section-card">
         <template #header>
-          <span class="section-title">📝 详细描述</span>
+          <span class="section-title">📝 详细信息</span>
         </template>
-        <p class="detail-text">{{ info.detail }}</p>
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="成色">{{ trade.condition }}</el-descriptions-item>
+          <el-descriptions-item label="地点">{{ trade.location }}</el-descriptions-item>
+          <el-descriptions-item label="发布时间">{{ trade.publishTime }}</el-descriptions-item>
+          <el-descriptions-item label="状态">
+            <el-tag :type="trade.status === 'open' ? 'success' : 'info'" size="small">
+              {{ trade.status === 'open' ? '在售' : '已售' }}
+            </el-tag>
+          </el-descriptions-item>
+        </el-descriptions>
       </el-card>
 
-      <!-- 卖家信息 -->
       <el-card shadow="never" class="section-card">
         <template #header>
           <span class="section-title">👤 卖家信息</span>
         </template>
         <div class="seller-row">
           <el-avatar :icon="User" size="default" />
-          <span class="seller-name">{{ info.seller }}</span>
+          <span class="seller-name">{{ trade.publisher }}</span>
         </div>
       </el-card>
 
-      <!-- 操作按钮 -->
       <div class="actions">
-        <el-button type="primary" size="large" @click="handleContact">
+        <el-button type="primary" size="large" @click="handleContact(trade.publisher)">
           💬 联系卖家
         </el-button>
-        <el-button size="large" @click="goBack">
-          返回列表
-        </el-button>
+        <el-button size="large" @click="goBack">返回列表</el-button>
       </div>
     </div>
 
-    <!-- 未找到 -->
-    <el-empty v-else :description="`ID: ${itemId} 的商品未找到`" />
+    <!-- ==================== 失物招领详情 ==================== -->
+    <div v-else-if="itemType === 'lostfound' && lostFound" class="detail-content">
+      <div class="detail-image">
+        <span class="image-icon">{{ lostFound.type === 'lost' ? '🔍' : '🎁' }}</span>
+      </div>
+
+      <div class="detail-header">
+        <div class="title-row">
+          <h1>{{ lostFound.title }}</h1>
+          <el-tag :type="lostFound.type === 'lost' ? 'danger' : 'success'" effect="light">
+            {{ lostFound.type === 'lost' ? '寻物' : '招领' }}
+          </el-tag>
+        </div>
+        <p class="desc">{{ lostFound.description }}</p>
+      </div>
+
+      <el-card shadow="never" class="section-card">
+        <template #header>
+          <span class="section-title">📝 详细信息</span>
+        </template>
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="物品名称">{{ lostFound.itemName }}</el-descriptions-item>
+          <el-descriptions-item label="地点">{{ lostFound.location }}</el-descriptions-item>
+          <el-descriptions-item label="时间">{{ lostFound.eventTime }}</el-descriptions-item>
+          <el-descriptions-item label="状态">
+            <el-tag :type="lostFound.status === 'open' ? 'warning' : 'info'" size="small">
+              {{ lostFound.status === 'open' ? '寻找中' : '已找到' }}
+            </el-tag>
+          </el-descriptions-item>
+        </el-descriptions>
+      </el-card>
+
+      <el-card shadow="never" class="section-card">
+        <template #header>
+          <span class="section-title">📞 联系方式</span>
+        </template>
+        <p class="contact-info">{{ lostFound.contact }}</p>
+      </el-card>
+
+      <div class="actions">
+        <el-button type="primary" size="large" @click="handleContact()">
+          💬 联系发布者
+        </el-button>
+        <el-button size="large" @click="goBack">返回列表</el-button>
+      </div>
+    </div>
+
+    <!-- ==================== 拼单搭子详情 ==================== -->
+    <div v-else-if="itemType === 'groupbuy' && groupBuy" class="detail-content">
+      <div class="detail-image">
+        <span class="image-icon">🤝</span>
+      </div>
+
+      <div class="detail-header">
+        <div class="title-row">
+          <h1>{{ groupBuy.title }}</h1>
+          <el-tag type="warning" effect="light">{{ groupBuy.type }}</el-tag>
+        </div>
+        <p class="desc">{{ groupBuy.description }}</p>
+      </div>
+
+      <el-card shadow="never" class="section-card">
+        <template #header>
+          <span class="section-title">📝 拼单进度</span>
+        </template>
+        <div class="progress-wrap">
+          <div class="progress-header">
+            <span>已有 <strong>{{ groupBuy.currentCount }}</strong> 人参与</span>
+            <span>目标 <strong>{{ groupBuy.targetCount }}</strong> 人</span>
+          </div>
+          <el-progress
+            :percentage="Math.round(groupBuy.currentCount / groupBuy.targetCount * 100)"
+            :stroke-width="16"
+            :color="groupBuy.currentCount >= groupBuy.targetCount ? '#67c23a' : '#409eff'"
+          />
+        </div>
+        <el-descriptions :column="2" border style="margin-top: 16px;">
+          <el-descriptions-item label="地点">{{ groupBuy.location }}</el-descriptions-item>
+          <el-descriptions-item label="截止时间">{{ groupBuy.deadline }}</el-descriptions-item>
+          <el-descriptions-item label="状态">
+            <el-tag :type="groupBuy.status === 'open' ? 'success' : 'info'" size="small">
+              {{ groupBuy.status === 'open' ? '进行中' : '已结束' }}
+            </el-tag>
+          </el-descriptions-item>
+        </el-descriptions>
+      </el-card>
+
+      <el-card shadow="never" class="section-card">
+        <template #header>
+          <span class="section-title">👤 发起者</span>
+        </template>
+        <div class="seller-row">
+          <el-avatar :icon="User" size="default" />
+          <span class="seller-name">{{ groupBuy.publisher }}</span>
+        </div>
+      </el-card>
+
+      <div class="actions">
+        <el-button type="primary" size="large" @click="handleContact(groupBuy.publisher)">
+          🤝 参与拼单
+        </el-button>
+        <el-button size="large" @click="goBack">返回列表</el-button>
+      </div>
+    </div>
+
+    <!-- ==================== 跑腿委托详情 ==================== -->
+    <div v-else-if="itemType === 'errand' && errand" class="detail-content">
+      <div class="detail-image">
+        <span class="image-icon">🏃</span>
+      </div>
+
+      <div class="detail-header">
+        <div class="title-row">
+          <h1>{{ errand.title }}</h1>
+          <el-tag type="danger" effect="light">{{ errand.taskType }}</el-tag>
+        </div>
+        <p class="price">💰 ￥{{ errand.reward }}</p>
+        <p class="desc">{{ errand.description }}</p>
+      </div>
+
+      <el-card shadow="never" class="section-card">
+        <template #header>
+          <span class="section-title">📝 任务详情</span>
+        </template>
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="起点">{{ errand.from }}</el-descriptions-item>
+          <el-descriptions-item label="终点">{{ errand.to }}</el-descriptions-item>
+          <el-descriptions-item label="截止时间">{{ errand.deadline }}</el-descriptions-item>
+          <el-descriptions-item label="状态">
+            <el-tag :type="errand.status === 'open' ? 'danger' : 'info'" size="small">
+              {{ errand.status === 'open' ? '待接单' : '已接单' }}
+            </el-tag>
+          </el-descriptions-item>
+        </el-descriptions>
+      </el-card>
+
+      <el-card shadow="never" class="section-card">
+        <template #header>
+          <span class="section-title">👤 发布者</span>
+        </template>
+        <div class="seller-row">
+          <el-avatar :icon="User" size="default" />
+          <span class="seller-name">{{ errand.publisher }}</span>
+        </div>
+      </el-card>
+
+      <div class="actions">
+        <el-button type="primary" size="large" @click="handleContact(errand.publisher)">
+          🏃 我要接单
+        </el-button>
+        <el-button size="large" @click="goBack">返回列表</el-button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -94,6 +299,10 @@ function handleContact() {
 
 .back-header {
   margin-bottom: 20px;
+}
+
+.loading-wrap {
+  padding: 40px 0;
 }
 
 .detail-image {
@@ -152,13 +361,6 @@ function handleContact() {
   font-size: 15px;
 }
 
-.detail-text {
-  margin: 0;
-  color: #555;
-  line-height: 1.8;
-  font-size: 15px;
-}
-
 .seller-row {
   display: flex;
   align-items: center;
@@ -168,6 +370,29 @@ function handleContact() {
 .seller-name {
   font-weight: 600;
   font-size: 15px;
+}
+
+.contact-info {
+  margin: 0;
+  color: #555;
+  font-size: 15px;
+}
+
+.progress-wrap {
+  text-align: center;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+.progress-header strong {
+  color: #333;
+  font-size: 18px;
 }
 
 .actions {
@@ -199,11 +424,6 @@ function handleContact() {
 
   .desc {
     font-size: 14px;
-  }
-
-  .detail-text {
-    font-size: 14px;
-    line-height: 1.7;
   }
 
   .actions {

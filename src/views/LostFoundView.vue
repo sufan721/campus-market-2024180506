@@ -19,6 +19,7 @@
         :tag="item.type === 'lost' ? '寻物' : '招领'"
         :location="item.location"
         :time="item.eventTime"
+        @click="goDetail(item.id)"
       >
         <template #footer>
           <span>{{ item.itemName }}</span>
@@ -31,9 +32,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import ItemCard from '../components/ItemCard.vue'
 import EmptyState from '../components/EmptyState.vue'
 import { getLostFounds, type LostFoundItem } from '../api/lostFound'
+
+const router = useRouter()
 
 const lostFounds = ref<LostFoundItem[]>([])
 
@@ -41,6 +45,10 @@ onMounted(async () => {
   const res = await getLostFounds()
   lostFounds.value = res.data
 })
+
+function goDetail(id: number) {
+  router.push({ name: 'Detail', params: { type: 'lostfound', id } })
+}
 </script>
 
 <style scoped>

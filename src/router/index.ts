@@ -39,7 +39,7 @@ const router = createRouter({
       component: () => import('../views/ErrandView.vue'),
     },
     {
-      path: '/detail/:id',
+      path: '/detail/:type/:id',
       name: 'Detail',
       component: () => import('../views/DetailView.vue'),
     },

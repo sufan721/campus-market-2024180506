@@ -19,6 +19,7 @@
         :tag="item.type"
         :location="item.location"
         :time="item.deadline"
+        @click="goDetail(item.id)"
       >
         <template #footer>
           <span>{{ item.currentCount }} / {{ item.targetCount }} 人</span>
@@ -36,9 +37,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import ItemCard from '../components/ItemCard.vue'
 import EmptyState from '../components/EmptyState.vue'
 import { getGroupBuys, type GroupBuyItem } from '../api/groupBuy'
+
+const router = useRouter()
 
 const groupBuys = ref<GroupBuyItem[]>([])
 
@@ -46,6 +50,10 @@ onMounted(async () => {
   const res = await getGroupBuys()
   groupBuys.value = res.data
 })
+
+function goDetail(id: number) {
+  router.push({ name: 'Detail', params: { type: 'groupbuy', id } })
+}
 </script>
 
 <style scoped>
