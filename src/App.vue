@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { HomeFilled, List, Edit, ChatDotRound, UserFilled, Expand, Fold } from '@element-plus/icons-vue'
+import { HomeFilled, List, Edit, ChatDotRound, UserFilled, Expand, Fold, Goods, Search, Connection, Service } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const activeIndex = ref('/home')
 const drawerVisible = ref(false)
 
+// 业务子页面的路由列表
+const bizRoutes = ['/trades', '/lost-found', '/group-buy', '/errands']
+
 // 监听路由变化更新活跃菜单
 watch(() => route.path, (path) => {
-  activeIndex.value = path
+  // 业务子页面高亮"分类"父菜单
+  activeIndex.value = bizRoutes.includes(path) ? '/trades' : path
 })
 
 // 屏幕宽度检测
@@ -27,10 +31,23 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { index: '/home', icon: HomeFilled, label: '首页' },
-  { index: '/list', icon: List, label: '列表' },
+  { index: '/trades', icon: List, label: '分类' },
   { index: '/publish', icon: Edit, label: '发布' },
   { index: '/message', icon: ChatDotRound, label: '消息' },
   { index: '/profile', icon: UserFilled, label: '我的' },
+]
+
+interface BizItem {
+  index: string
+  icon: typeof Goods
+  label: string
+}
+
+const bizItems: BizItem[] = [
+  { index: '/trades', icon: Goods, label: '二手交易' },
+  { index: '/lost-found', icon: Search, label: '失物招领' },
+  { index: '/group-buy', icon: Connection, label: '拼单搭子' },
+  { index: '/errands', icon: Service, label: '跑腿委托' },
 ]
 
 function onNavSelect(index: string) {
@@ -59,10 +76,22 @@ function onNavSelect(index: string) {
           class="header-nav desktop-nav"
           @select="(index: string) => activeIndex = index"
         >
-          <el-menu-item v-for="item in navItems" :key="item.index" :index="item.index">
-            <el-icon><component :is="item.icon" /></el-icon>
-            <span>{{ item.label }}</span>
-          </el-menu-item>
+          <template v-for="item in navItems" :key="item.index">
+            <el-sub-menu v-if="item.index === '/trades'" index="biz-sub">
+              <template #title>
+                <el-icon><component :is="item.icon" /></el-icon>
+                <span>{{ item.label }}</span>
+              </template>
+              <el-menu-item v-for="biz in bizItems" :key="biz.index" :index="biz.index">
+                <el-icon><component :is="biz.icon" /></el-icon>
+                <span>{{ biz.label }}</span>
+              </el-menu-item>
+            </el-sub-menu>
+            <el-menu-item v-else :index="item.index">
+              <el-icon><component :is="item.icon" /></el-icon>
+              <span>{{ item.label }}</span>
+            </el-menu-item>
+          </template>
         </el-menu>
 
         <!-- 移动端汉堡按钮 -->
@@ -108,10 +137,22 @@ function onNavSelect(index: string) {
         class="drawer-menu"
         @select="(index: string) => onNavSelect(index)"
       >
-        <el-menu-item v-for="item in navItems" :key="item.index" :index="item.index">
-          <el-icon><component :is="item.icon" /></el-icon>
-          <span>{{ item.label }}</span>
-        </el-menu-item>
+        <template v-for="item in navItems" :key="item.index">
+          <el-sub-menu v-if="item.index === '/trades'" index="biz-sub-drawer">
+            <template #title>
+              <el-icon><component :is="item.icon" /></el-icon>
+              <span>{{ item.label }}</span>
+            </template>
+            <el-menu-item v-for="biz in bizItems" :key="biz.index" :index="biz.index">
+              <el-icon><component :is="biz.icon" /></el-icon>
+              <span>{{ biz.label }}</span>
+            </el-menu-item>
+          </el-sub-menu>
+          <el-menu-item v-else :index="item.index">
+            <el-icon><component :is="item.icon" /></el-icon>
+            <span>{{ item.label }}</span>
+          </el-menu-item>
+        </template>
       </el-menu>
     </el-drawer>
 
