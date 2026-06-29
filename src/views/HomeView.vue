@@ -2,6 +2,8 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { List, Edit, ChatDotRound, TrendCharts, Right } from '@element-plus/icons-vue'
+import { getTrades, type TradeItem } from '../api/trade'
+import ImageBox from '../components/ImageBox.vue'
 
 const router = useRouter()
 
@@ -30,13 +32,12 @@ const statDisplays = ref<string[]>(stats.map(() => '0'))
 const statsRevealed = ref(false)
 
 function animateCount(el: StatItem, index: number) {
-  const duration = 2000 // 动画总时长 ms
+  const duration = 2000
   const startTime = performance.now()
 
   function tick(now: number) {
     const elapsed = now - startTime
     const progress = Math.min(elapsed / duration, 1)
-    // easeOutExpo 缓出
     const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress)
     const current = Math.round(eased * el.target)
     statDisplays.value[index] = current + el.suffix
@@ -49,33 +50,37 @@ function animateCount(el: StatItem, index: number) {
 }
 
 onMounted(() => {
-  // 页面加载后立即开始数字滚动
   statsRevealed.value = true
   stats.forEach((s, i) => {
-    // 每个数字延迟一点依次启动
     setTimeout(() => animateCount(s, i), 250 + i * 120)
   })
 })
 
-interface Product {
-  id: number
-  title: string
-  price: number
-  desc: string
-  tag: string
-  tagType: '' | 'success' | 'warning' | 'info' | 'danger'
+// ========== 推荐 — 展示商品 ==========
+const allTrades = ref<TradeItem[]>([])
+const loading = ref(true)
+
+onMounted(async () => {
+  try {
+    const res = await getTrades()
+    allTrades.value = res.data
+  } finally {
+    loading.value = false
+  }
+})
+
+/** 根据 category 推导 tag 和 tagType */
+const tagMap: Record<string, { tag: string; tagType: 'success' | 'warning' | 'info' | 'danger' }> = {
+  '教材资料': { tag: '教材', tagType: 'info' },
+  '数码配件': { tag: '数码', tagType: 'success' },
+  '生活用品': { tag: '生活', tagType: 'warning' },
+  '出行工具': { tag: '出行', tagType: 'success' },
+  '家用电器': { tag: '家电', tagType: 'danger' },
 }
 
-const products = ref<Product[]>([
-  { id: 1, title: '二手教材-高等数学', price: 15, desc: '九成新，几乎无笔记', tag: '教材', tagType: 'info' },
-  { id: 2, title: '机械键盘 IKBC C87', price: 80, desc: '樱桃红轴，使用一年', tag: '数码', tagType: 'success' },
-  { id: 3, title: '台灯 LED 护眼', price: 25, desc: '三档调光，配件齐全', tag: '生活', tagType: 'warning' },
-  { id: 4, title: '代取快递服务', price: 3, desc: '校内驿站代取，当日送达', tag: '服务', tagType: 'danger' },
-  { id: 5, title: '考研英语真题集', price: 20, desc: '2024版，含解析册', tag: '教材', tagType: 'info' },
-  { id: 6, title: '二手自行车 26寸', price: 120, desc: '八成新，送锁和打气筒', tag: '出行', tagType: 'success' },
-])
-
-const displayProducts = products.value.slice(0, 6)
+function getTagInfo(category: string) {
+  return tagMap[category] || { tag: category, tagType: 'info' as const }
+}
 
 // ========== 滚动触发入场 ==========
 const featuresRef = ref<HTMLElement | null>(null)
@@ -117,7 +122,6 @@ function goDetail(id: number) {
       <h2 class="hero-title">欢迎来到校园轻集市</h2>
       <p class="hero-desc">一个专为校园打造的信息发布与交易平台，让闲置流转更简单</p>
 
-      <!-- 数据滚动计数器 -->
       <div class="hero-stats" :class="{ revealed: statsRevealed }">
         <div v-for="(s, i) in stats" :key="s.label" class="hero-stat-item">
           <span class="hero-stat-number">{{ statDisplays[i] }}</span>
@@ -158,7 +162,7 @@ function goDetail(id: number) {
       </el-row>
     </section>
 
-    <!-- ======== 最新商品（滚动触发） ======== -->
+    <!-- ======== 推荐（按分类展示，滚动触发） ======== -->
     <section
       ref="productsRef"
       class="reveal-section"
@@ -166,17 +170,28 @@ function goDetail(id: number) {
     >
       <div class="section-header">
         <div>
-          <h2 class="section-title">最新商品</h2>
-          <p class="section-subtitle">看看大家都在卖什么</p>
+          <h2 class="section-title">推荐</h2>
+          <p class="section-subtitle">精选好物，按分类浏览</p>
         </div>
         <el-button type="primary" link :icon="Right" @click="$router.push('/list')">
           查看全部
         </el-button>
       </div>
 
-      <el-row :gutter="16">
+      <!-- 加载骨架 -->
+      <div v-if="loading">
+        <el-row :gutter="16">
+          <el-col v-for="n in 3" :key="n" :xs="24" :sm="12" :md="8">
+            <el-card shadow="hover" class="product-card">
+              <el-skeleton :rows="3" animated />
+            </el-card>
+          </el-col>
+        </el-row>
+      </div>
+
+      <el-row v-else :gutter="16">
         <el-col
-          v-for="(item, idx) in displayProducts"
+          v-for="(item, idx) in allTrades"
           :key="item.id"
           :xs="24" :sm="12" :md="8"
         >
@@ -184,17 +199,23 @@ function goDetail(id: number) {
             shadow="hover"
             class="product-card"
             :style="{ animationDelay: `${0.15 + idx * 0.1}s` }"
-            @click="goDetail(item.id)"
+            @click="goDetail(Number(item.id))"
           >
-            <div class="product-image">
-              <span class="product-image-icon">📦</span>
-            </div>
+            <ImageBox
+              :image-path="item.image"
+              fallback-emoji="📦"
+              height="140px"
+              border-radius="12px 12px 0 0"
+              icon-size="48px"
+            />
             <div class="product-body">
               <div class="product-header">
                 <h3 class="product-title">{{ item.title }}</h3>
-                <el-tag :type="item.tagType" size="small" effect="plain">{{ item.tag }}</el-tag>
+                <el-tag :type="getTagInfo(item.category).tagType" size="small" effect="plain">
+                  {{ getTagInfo(item.category).tag }}
+                </el-tag>
               </div>
-              <p class="product-desc">{{ item.desc }}</p>
+              <p class="product-desc">{{ item.description }}</p>
               <div class="product-footer">
                 <span class="product-price">¥{{ item.price }}</span>
                 <el-button type="primary" link :icon="Right">查看详情</el-button>
@@ -251,16 +272,15 @@ function goDetail(id: number) {
   min-height: 100vh;
   text-align: center;
   padding: 40px 20px 32px;
-  margin-top: -28px;     /* 消除 el-main 的 padding-top */
+  margin-top: -28px;
   margin-bottom: 32px;
-  margin-left: calc(-50vw + 50%);   /* 背景拉满视口宽度 */
+  margin-left: calc(-50vw + 50%);
   margin-right: calc(-50vw + 50%);
   background: url('/hero-bg.jpg') center / cover no-repeat;
   border-radius: 0;
   position: relative;
 }
 
-/* 背景蒙层 */
 .hero::before {
   content: '';
   position: absolute;
@@ -269,13 +289,11 @@ function goDetail(id: number) {
   z-index: 0;
 }
 
-/* Hero 内容置于蒙层之上 */
 .hero > * {
   position: relative;
   z-index: 1;
 }
 
-/* 逐行浮现：初始隐藏 */
 .hero-title,
 .hero-desc,
 .hero-stats,
@@ -283,7 +301,6 @@ function goDetail(id: number) {
   opacity: 0;
 }
 
-/* 逐行浮现：依次触发 */
 .hero-badge {
   display: inline-block;
   padding: 4px 16px;
@@ -315,7 +332,6 @@ function goDetail(id: number) {
   animation: fadeInUp 0.6s ease-out 0.85s forwards;
 }
 
-/* 数据滚动计数器 */
 .hero-stats {
   display: flex;
   gap: 40px;
@@ -351,7 +367,6 @@ function goDetail(id: number) {
   animation: fadeInUp 0.6s ease-out 1.15s forwards;
 }
 
-/* 按钮框体样式 */
 .hero-btn {
   min-width: 140px;
   height: 46px;
@@ -509,20 +524,6 @@ function goDetail(id: number) {
   padding: 0;
 }
 
-.product-image {
-  height: 140px;
-  background: linear-gradient(135deg, #e8f4fd 0%, #dce9f5 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px 12px 0 0;
-}
-
-.product-image-icon {
-  font-size: 48px;
-  opacity: 0.6;
-}
-
 .product-body {
   padding: 14px 16px 16px;
 }
@@ -667,14 +668,6 @@ function goDetail(id: number) {
     font-size: 19px;
   }
 
-  .product-image {
-    height: 120px;
-  }
-
-  .product-image-icon {
-    font-size: 40px;
-  }
-
   .product-body {
     padding: 12px 14px 14px;
   }
@@ -728,14 +721,6 @@ function goDetail(id: number) {
 
   .section-title {
     font-size: 17px;
-  }
-
-  .product-image {
-    height: 100px;
-  }
-
-  .product-image-icon {
-    font-size: 36px;
   }
 
   .product-title {

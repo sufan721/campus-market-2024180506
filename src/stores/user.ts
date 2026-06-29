@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { getUserById, type UserInfo as ApiUserInfo } from '../api/user'
 
 export interface UserInfo {
   id: number
@@ -13,28 +14,41 @@ export interface UserInfo {
 }
 
 export const useUserStore = defineStore('user', () => {
-  // 当前登录用户（模拟：默认用户 ID=1 张三）
-  const currentUser = ref<UserInfo>({
-    id: 1,
-    name: '张三',
-    avatar: '',
-    school: 'XX大学',
-    department: '软件工程',
-    grade: '2023级',
-    joinDate: '2026-03-01',
-    contact: 'QQ：111222333',
-  })
+  const currentUser = ref<UserInfo | null>(null)
+  const loading = ref(false)
 
-  const userId = computed(() => currentUser.value.id)
+  const userId = computed(() => currentUser.value?.id ?? null)
+
+  /** 从 API 加载用户信息 */
+  async function loadUser(id: number | string) {
+    loading.value = true
+    try {
+      const res = await getUserById(id)
+      currentUser.value = {
+        id: Number(res.data.id),
+        name: res.data.name,
+        avatar: res.data.avatar,
+        school: res.data.school,
+        department: res.data.department,
+        grade: res.data.grade,
+        joinDate: res.data.joinDate,
+        contact: res.data.contact,
+      }
+    } finally {
+      loading.value = false
+    }
+  }
 
   /** 切换用户（仅用于 Demo 演示） */
-  function switchUser(user: UserInfo) {
+  async function switchUser(user: UserInfo) {
     currentUser.value = user
   }
 
   return {
     currentUser,
     userId,
+    loading,
+    loadUser,
     switchUser,
   }
 })

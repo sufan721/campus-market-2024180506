@@ -7,6 +7,7 @@ import { getTradeById, type TradeItem } from '../api/trade'
 import { getLostFoundById, type LostFoundItem } from '../api/lostFound'
 import { getGroupBuyById, type GroupBuyItem } from '../api/groupBuy'
 import { getErrandById, type ErrandItem } from '../api/errand'
+import ImageBox from '../components/ImageBox.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -89,9 +90,13 @@ function handleContact(contactName?: string) {
 
     <!-- ==================== 二手交易详情 ==================== -->
     <div v-else-if="itemType === 'trade' && trade" class="detail-content">
-      <div class="detail-image">
-        <span class="image-icon">📦</span>
-      </div>
+      <ImageBox
+        :image-path="trade.image"
+        fallback-emoji="📦"
+        height="220px"
+        border-radius="16px"
+        icon-size="72px"
+      />
 
       <div class="detail-header">
         <div class="title-row">
@@ -138,9 +143,13 @@ function handleContact(contactName?: string) {
 
     <!-- ==================== 失物招领详情 ==================== -->
     <div v-else-if="itemType === 'lostfound' && lostFound" class="detail-content">
-      <div class="detail-image">
-        <span class="image-icon">{{ lostFound.type === 'lost' ? '🔍' : '🎁' }}</span>
-      </div>
+      <ImageBox
+        :image-path="lostFound.image"
+        :fallback-emoji="lostFound.type === 'lost' ? '🔍' : '🎁'"
+        height="220px"
+        border-radius="16px"
+        icon-size="72px"
+      />
 
       <div class="detail-header">
         <div class="title-row">
@@ -185,9 +194,13 @@ function handleContact(contactName?: string) {
 
     <!-- ==================== 拼单搭子详情 ==================== -->
     <div v-else-if="itemType === 'groupbuy' && groupBuy" class="detail-content">
-      <div class="detail-image">
-        <span class="image-icon">🤝</span>
-      </div>
+      <ImageBox
+        :image-path="groupBuy.image"
+        fallback-emoji="🤝"
+        height="220px"
+        border-radius="16px"
+        icon-size="72px"
+      />
 
       <div class="detail-header">
         <div class="title-row">
@@ -243,9 +256,13 @@ function handleContact(contactName?: string) {
 
     <!-- ==================== 跑腿委托详情 ==================== -->
     <div v-else-if="itemType === 'errand' && errand" class="detail-content">
-      <div class="detail-image">
-        <span class="image-icon">🏃</span>
-      </div>
+      <ImageBox
+        :image-path="errand.image"
+        fallback-emoji="🏃"
+        height="220px"
+        border-radius="16px"
+        icon-size="72px"
+      />
 
       <div class="detail-header">
         <div class="title-row">

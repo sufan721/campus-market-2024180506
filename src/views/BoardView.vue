@@ -1,34 +1,39 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { TrendCharts, UserFilled, Goods, Coin } from '@element-plus/icons-vue'
+import { getDashboard, type DashboardData } from '../api/dashboard'
+
+const dashboard = ref<DashboardData | null>(null)
+const loading = ref(true)
 
 const stats = ref([
-  { label: '注册用户', value: 1286, icon: UserFilled, color: '#409eff', bg: '#ecf5ff' },
-  { label: '在售商品', value: 567, icon: Goods, color: '#67c23a', bg: '#f0f9eb' },
-  { label: '累计订单', value: 2341, icon: Coin, color: '#e6a23c', bg: '#fdf6ec' },
-  { label: '今日活跃', value: 89, icon: TrendCharts, color: '#f56c6c', bg: '#fef0f0' },
+  { label: '注册用户', value: 0, icon: UserFilled, color: '#409eff', bg: '#ecf5ff' },
+  { label: '在售商品', value: 0, icon: Goods, color: '#67c23a', bg: '#f0f9eb' },
+  { label: '累计订单', value: 0, icon: Coin, color: '#e6a23c', bg: '#fdf6ec' },
+  { label: '今日活跃', value: 0, icon: TrendCharts, color: '#f56c6c', bg: '#fef0f0' },
 ])
 
-const weeklyData = ref([
-  { day: '一', count: 34 },
-  { day: '二', count: 42 },
-  { day: '三', count: 28 },
-  { day: '四', count: 51 },
-  { day: '五', count: 67 },
-  { day: '六', count: 45 },
-  { day: '日', count: 22 },
-])
+const weeklyData = ref<{ day: string; count: number }[]>([])
+const categories = ref<{ name: string; count: number; color: string }[]>([])
 
-const categories = ref([
-  { name: '二手教材', count: 124, color: '#409eff' },
-  { name: '电子产品', count: 98, color: '#67c23a' },
-  { name: '生活用品', count: 87, color: '#e6a23c' },
-  { name: '代取服务', count: 56, color: '#f56c6c' },
-  { name: '其他', count: 202, color: '#909399' },
-])
+onMounted(async () => {
+  try {
+    const res = await getDashboard()
+    dashboard.value = res.data
+    const d = res.data
+    stats.value[0].value = d.userCount
+    stats.value[1].value = d.productCount
+    stats.value[2].value = d.orderCount
+    stats.value[3].value = d.activeToday
+    weeklyData.value = d.weeklyData
+    categories.value = d.categories
+  } finally {
+    loading.value = false
+  }
+})
 
-const maxWeekly = Math.max(...weeklyData.value.map(d => d.count))
-const maxCategory = Math.max(...categories.value.map(c => c.count))
+const maxWeekly = computed(() => Math.max(...weeklyData.value.map(d => d.count), 1))
+const maxCategory = computed(() => Math.max(...categories.value.map(c => c.count), 1))
 </script>
 
 <template>
@@ -38,64 +43,80 @@ const maxCategory = Math.max(...categories.value.map(c => c.count))
       <p class="subtitle">校园市场运营概览 · 实时数据</p>
     </div>
 
-    <!-- 统计卡片 -->
-    <el-row :gutter="16" class="stats-row">
-      <el-col v-for="s in stats" :key="s.label" :xs="12" :sm="6">
-        <el-card shadow="hover" class="stat-card">
-          <div class="stat-inner">
-            <div class="stat-icon" :style="{ background: s.bg }">
-              <el-icon :size="24" :color="s.color"><component :is="s.icon" /></el-icon>
+    <!-- 加载骨架 -->
+    <template v-if="loading">
+      <el-row :gutter="16" class="stats-row">
+        <el-col v-for="n in 4" :key="n" :xs="12" :sm="6">
+          <el-card shadow="hover" class="stat-card">
+            <el-skeleton :rows="2" animated />
+          </el-card>
+        </el-col>
+      </el-row>
+      <el-card shadow="never" class="chart-card">
+        <el-skeleton :rows="5" animated />
+      </el-card>
+    </template>
+
+    <template v-else>
+      <!-- 统计卡片 -->
+      <el-row :gutter="16" class="stats-row">
+        <el-col v-for="s in stats" :key="s.label" :xs="12" :sm="6">
+          <el-card shadow="hover" class="stat-card">
+            <div class="stat-inner">
+              <div class="stat-icon" :style="{ background: s.bg }">
+                <el-icon :size="24" :color="s.color"><component :is="s.icon" /></el-icon>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value">{{ s.value }}</span>
+                <span class="stat-label">{{ s.label }}</span>
+              </div>
             </div>
-            <div class="stat-info">
-              <span class="stat-value">{{ s.value }}</span>
-              <span class="stat-label">{{ s.label }}</span>
-            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+
+      <!-- 柱状图 -->
+      <el-card shadow="never" class="chart-card">
+        <template #header>
+          <span class="card-title">📊 本周发布量</span>
+        </template>
+        <div class="bar-chart">
+          <div v-for="d in weeklyData" :key="d.day" class="bar-col">
+            <span class="bar-value">{{ d.count }}</span>
+            <div
+              class="bar"
+              :style="{
+                height: (d.count / maxWeekly * 140) + 'px',
+                background: d.count === maxWeekly
+                  ? 'linear-gradient(180deg, #409eff, #66b1ff)'
+                  : 'linear-gradient(180deg, #a0cfff, #c6e2ff)'
+              }"
+            ></div>
+            <span class="bar-label">{{ d.day }}</span>
           </div>
-        </el-card>
-      </el-col>
-    </el-row>
-
-    <!-- 柱状图 -->
-    <el-card shadow="never" class="chart-card">
-      <template #header>
-        <span class="card-title">📊 本周发布量</span>
-      </template>
-      <div class="bar-chart">
-        <div v-for="d in weeklyData" :key="d.day" class="bar-col">
-          <span class="bar-value">{{ d.count }}</span>
-          <div
-            class="bar"
-            :style="{
-              height: (d.count / maxWeekly * 140) + 'px',
-              background: d.count === maxWeekly
-                ? 'linear-gradient(180deg, #409eff, #66b1ff)'
-                : 'linear-gradient(180deg, #a0cfff, #c6e2ff)'
-            }"
-          ></div>
-          <span class="bar-label">{{ d.day }}</span>
         </div>
-      </div>
-    </el-card>
+      </el-card>
 
-    <!-- 分类分布 -->
-    <el-card shadow="never" class="chart-card">
-      <template #header>
-        <span class="card-title">📂 分类分布</span>
-      </template>
-      <div class="category-list">
-        <div v-for="cat in categories" :key="cat.name" class="category-row">
-          <span class="cat-name">{{ cat.name }}</span>
-          <el-progress
-            :percentage="Math.round(cat.count / maxCategory * 100)"
-            :color="cat.color"
-            :stroke-width="14"
-            :show-text="false"
-            style="flex:1;margin:0 12px;"
-          />
-          <span class="cat-count">{{ cat.count }}</span>
+      <!-- 分类分布 -->
+      <el-card shadow="never" class="chart-card">
+        <template #header>
+          <span class="card-title">📂 分类分布</span>
+        </template>
+        <div class="category-list">
+          <div v-for="cat in categories" :key="cat.name" class="category-row">
+            <span class="cat-name">{{ cat.name }}</span>
+            <el-progress
+              :percentage="Math.round(cat.count / maxCategory * 100)"
+              :color="cat.color"
+              :stroke-width="14"
+              :show-text="false"
+              style="flex:1;margin:0 12px;"
+            />
+            <span class="cat-count">{{ cat.count }}</span>
+          </div>
         </div>
-      </div>
-    </el-card>
+      </el-card>
+    </template>
   </div>
 </template>
 

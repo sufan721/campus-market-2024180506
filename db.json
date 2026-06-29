@@ -118,6 +118,7 @@
       "eventTime": "2026-06-02 12:10",
       "contact": "站内消息联系",
       "status": "open",
+      "image": "",
       "description": "校园卡卡套为黑色，内有学生证。"
     },
     {
@@ -130,6 +131,7 @@
       "eventTime": "2026-06-02 18:40",
       "contact": "站内消息联系",
       "status": "open",
+      "image": "",
       "description": "雨伞放在 A 区一楼值班室。"
     },
     {
@@ -142,6 +144,7 @@
       "eventTime": "2026-06-03 15:20",
       "contact": "QQ：123456789",
       "status": "open",
+      "image": "",
       "description": "银色金属外壳，32GB，挂有红色小绳，内有课程作业。"
     },
     {
@@ -154,6 +157,7 @@
       "eventTime": "2026-06-04 12:30",
       "contact": "站内消息联系",
       "status": "open",
+      "image": "",
       "description": "黑色半框眼镜，放在食堂失物招领处。"
     },
     {
@@ -166,6 +170,7 @@
       "eventTime": "2026-06-05 17:45",
       "contact": "微信号：campus_help",
       "status": "open",
+      "image": "",
       "description": "白色 AirPods 充电仓（不含耳机），可能有同学跑步时掉落。"
     },
     {
@@ -178,6 +183,7 @@
       "eventTime": "2026-06-06 09:10",
       "contact": "站内消息联系",
       "status": "open",
+      "image": "",
       "description": "共三把钥匙和一个蓝色门禁卡，交至图书馆服务台。"
     }
   ],
@@ -193,6 +199,7 @@
       "location": "学校南门",
       "publisher": "计算机学院学生",
       "status": "open",
+      "image": "",
       "description": "AA 制，人数够后统一预约。"
     },
     {
@@ -206,6 +213,7 @@
       "location": "线上确认",
       "publisher": "外国语学院学生",
       "status": "open",
+      "image": "",
       "description": "达到人数后统一下单。"
     },
     {
@@ -219,6 +227,7 @@
       "location": "体育馆羽毛球场",
       "publisher": "体育学院学生",
       "status": "open",
+      "image": "",
       "description": "拼场地费用，每人约15元，自带球拍。"
     },
     {
@@ -232,6 +241,7 @@
       "location": "校内打印店",
       "publisher": "学生会学习部",
       "status": "open",
+      "image": "",
       "description": "满20人打印费打八折，期末复习资料集中打印。"
     },
     {
@@ -245,6 +255,7 @@
       "location": "校门口奶茶店",
       "publisher": "文学院学生",
       "status": "open",
+      "image": "",
       "description": "满8杯享七折，一起下单更划算。"
     },
     {
@@ -258,6 +269,7 @@
       "location": "线上确认",
       "publisher": "大二学生代表",
       "status": "open",
+      "image": "",
       "description": "团购下学期教材，比单买便宜30%左右。"
     }
   ],
@@ -273,6 +285,7 @@
       "deadline": "2026-06-03 19:00",
       "publisher": "西区学生",
       "status": "open",
+      "image": "",
       "description": "快递较轻，送到宿舍楼下即可。"
     },
     {
@@ -286,6 +299,7 @@
       "deadline": "2026-06-03 18:30",
       "publisher": "实验室学生",
       "status": "open",
+      "image": "",
       "description": "需要在 18:30 前送到。"
     },
     {
@@ -299,6 +313,7 @@
       "deadline": "2026-06-08 17:00",
       "publisher": "大三学生",
       "status": "open",
+      "image": "",
       "description": "搬宿舍，需要帮忙搬两个行李箱和若干纸箱，有电梯。"
     },
     {
@@ -312,6 +327,7 @@
       "deadline": "2026-06-04 16:00",
       "publisher": "西区学生",
       "status": "open",
+      "image": "",
       "description": "代还两本书到图书馆，书已准备好，直接拿去还即可。"
     },
     {
@@ -325,6 +341,7 @@
       "deadline": "2026-06-05 11:00",
       "publisher": "研究生学长",
       "status": "open",
+      "image": "",
       "description": "打印一份论文（约80页），双面打印并装订。"
     },
     {
@@ -338,8 +355,74 @@
       "deadline": "2026-06-06 21:00",
       "publisher": "东区学生",
       "status": "open",
+      "image": "",
       "description": "代购洗发水、牙膏等日用品，清单已列好，约50元。"
     }
   ],
+  "messages": [
+    {
+      "id": 1,
+      "userId": 1,
+      "from": "李四",
+      "content": "你好，高等数学教材还在吗？我想买",
+      "time": "2026-06-29 09:30",
+      "unread": true
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "from": "王五",
+      "content": "键盘能便宜点吗？60出吗？",
+      "time": "2026-06-29 08:15",
+      "unread": true
+    },
+    {
+      "id": 3,
+      "userId": 1,
+      "from": "系统通知",
+      "content": "你的商品"台灯 LED 护眼"已通过审核",
+      "time": "2026-06-28 14:20",
+      "unread": false
+    },
+    {
+      "id": 4,
+      "userId": 1,
+      "from": "赵六",
+      "content": "好的，明天下午3点交易可以吗？",
+      "time": "2026-06-27 16:45",
+      "unread": false
+    },
+    {
+      "id": 5,
+      "userId": 1,
+      "from": "系统通知",
+      "content": "欢迎加入校园轻集市！请完善你的个人资料",
+      "time": "2026-06-25 10:00",
+      "unread": false
+    }
+  ],
+  "dashboard": {
+    "id": 1,
+    "userCount": 1286,
+    "productCount": 567,
+    "orderCount": 2341,
+    "activeToday": 89,
+    "weeklyData": [
+      { "day": "一", "count": 34 },
+      { "day": "二", "count": 42 },
+      { "day": "三", "count": 28 },
+      { "day": "四", "count": 56 },
+      { "day": "五", "count": 48 },
+      { "day": "六", "count": 22 },
+      { "day": "日", "count": 18 }
+    ],
+    "categories": [
+      { "name": "二手教材", "count": 124, "color": "#409eff" },
+      { "name": "数码配件", "count": 98, "color": "#67c23a" },
+      { "name": "生活用品", "count": 156, "color": "#e6a23c" },
+      { "name": "出行工具", "count": 45, "color": "#f56c6c" },
+      { "name": "其他", "count": 144, "color": "#909399" }
+    ]
+  },
   "$schema": "./node_modules/json-server/schema.json"
 }

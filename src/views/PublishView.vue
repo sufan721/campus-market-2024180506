@@ -31,6 +31,7 @@ const tradeForm = reactive({
   price: undefined as number | undefined,
   condition: '',
   location: '',
+  image: '',
   description: '',
 })
 
@@ -41,7 +42,8 @@ const lostFoundForm = reactive({
   itemName: '',
   location: '',
   eventTime: '',
-  contact: userStore.currentUser.contact,
+  contact: userStore.currentUser?.contact || '',
+  image: '',
   description: '',
 })
 
@@ -52,6 +54,7 @@ const groupBuyForm = reactive({
   targetCount: undefined as number | undefined,
   location: '',
   deadline: '',
+  image: '',
   description: '',
 })
 
@@ -63,6 +66,7 @@ const errandForm = reactive({
   from: '',
   to: '',
   deadline: '',
+  image: '',
   description: '',
 })
 
@@ -138,7 +142,9 @@ const currentRules = computed<FormRules>(() => {
 
 // 发布者展示名称
 const publisherName = computed(() =>
-  `${userStore.currentUser.department} ${userStore.currentUser.grade}学生`
+  userStore.currentUser
+    ? `${userStore.currentUser.department} ${userStore.currentUser.grade}学生`
+    : ''
 )
 
 // 格式化当前时间
@@ -176,7 +182,7 @@ async function submitPublish() {
           location: tradeForm.location,
           publisher: publisherName.value,
           publishTime: now(),
-          image: '',
+          image: tradeForm.image || '',
           status: 'open',
           description: tradeForm.description,
         })
@@ -192,6 +198,7 @@ async function submitPublish() {
           eventTime: lostFoundForm.eventTime || now(),
           contact: lostFoundForm.contact,
           status: 'open',
+          image: lostFoundForm.image || '',
           description: lostFoundForm.description,
         })
         break
@@ -207,6 +214,7 @@ async function submitPublish() {
           location: groupBuyForm.location,
           publisher: publisherName.value,
           status: 'open',
+          image: groupBuyForm.image || '',
           description: groupBuyForm.description,
         })
         break
@@ -222,6 +230,7 @@ async function submitPublish() {
           deadline: errandForm.deadline,
           publisher: publisherName.value,
           status: 'open',
+          image: errandForm.image || '',
           description: errandForm.description,
         })
         break
@@ -244,7 +253,7 @@ async function submitPublish() {
       <h1>发布信息</h1>
       <p class="subtitle">
         当前身份：
-        <strong>{{ userStore.currentUser.name }}</strong>
+        <strong>{{ userStore.currentUser?.name || '未登录' }}</strong>
         （{{ publisherName }}）
       </p>
     </div>
@@ -317,6 +326,10 @@ async function submitPublish() {
           <el-input v-model="tradeForm.location" placeholder="如：东区宿舍、图书馆门口" clearable />
         </el-form-item>
 
+        <el-form-item label="图片链接（可选）" prop="image">
+          <el-input v-model="tradeForm.image" placeholder="如：/images/my-item.jpg（图片请放在 public/images/ 目录下）" clearable />
+        </el-form-item>
+
         <el-form-item label="详细描述" prop="description">
           <el-input v-model="tradeForm.description" type="textarea" :rows="4" maxlength="500" show-word-limit placeholder="请详细描述商品状况…" />
         </el-form-item>
@@ -362,6 +375,10 @@ async function submitPublish() {
 
         <el-form-item label="联系方式" prop="contact">
           <el-input v-model="lostFoundForm.contact" placeholder="站内消息联系" clearable />
+        </el-form-item>
+
+        <el-form-item label="图片链接（可选）" prop="image">
+          <el-input v-model="lostFoundForm.image" placeholder="如：/images/my-item.jpg" clearable />
         </el-form-item>
 
         <el-form-item label="详细描述" prop="description">
@@ -418,6 +435,10 @@ async function submitPublish() {
         <el-form-item label="详细描述" prop="description">
           <el-input v-model="groupBuyForm.description" type="textarea" :rows="4" maxlength="500" show-word-limit placeholder="AA 制，人数够后统一预约。" />
         </el-form-item>
+
+        <el-form-item label="图片链接（可选）" prop="image">
+          <el-input v-model="groupBuyForm.image" placeholder="如：/images/group-buy.jpg" clearable />
+        </el-form-item>
       </el-form>
 
       <!-- ===================== 跑腿委托表单 ===================== -->
@@ -468,6 +489,10 @@ async function submitPublish() {
 
         <el-form-item label="截止时间" prop="deadline">
           <el-input v-model="errandForm.deadline" placeholder="2026-06-03 19:00" clearable />
+        </el-form-item>
+
+        <el-form-item label="图片链接（可选）" prop="image">
+          <el-input v-model="errandForm.image" placeholder="如：/images/errand.jpg" clearable />
         </el-form-item>
 
         <el-form-item label="详细描述" prop="description">

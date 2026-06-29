@@ -10,6 +10,7 @@ export interface LostFoundItem {
   eventTime: string
   contact: string
   status: string
+  image: string
   description: string
 }
 

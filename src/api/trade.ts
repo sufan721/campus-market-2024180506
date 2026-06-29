@@ -27,6 +27,10 @@ export function getTradeById(id: number) {
   return http.get<TradeItem>(`/trades/${id}`)
 }
 
+export function getRecentTrades(limit: number = 6) {
+  return http.get<TradeItem[]>(`/trades?_sort=publishTime&_order=desc&_limit=${limit}`)
+}
+
 export function createTrade(data: Omit<TradeItem, 'id'>) {
   return http.post<TradeItem>('/trades', data)
 }

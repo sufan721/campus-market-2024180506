@@ -11,6 +11,7 @@ export interface ErrandItem {
   deadline: string
   publisher: string
   status: string
+  image: string
   description: string
 }
 

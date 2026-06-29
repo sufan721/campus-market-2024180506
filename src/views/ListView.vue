@@ -1,33 +1,43 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Search, Right } from '@element-plus/icons-vue'
+import { getTrades, type TradeItem } from '../api/trade'
+import ImageBox from '../components/ImageBox.vue'
 
 const router = useRouter()
 
-interface ListItem {
-  id: number
-  title: string
-  price: number
-  desc: string
-  tag: string
-  tagType: '' | 'success' | 'warning' | 'info' | 'danger'
+const items = ref<TradeItem[]>([])
+const loading = ref(true)
+
+const tagMap: Record<string, { tag: string; tagType: 'success' | 'warning' | 'info' | 'danger' }> = {
+  '教材资料': { tag: '教材', tagType: 'info' },
+  '数码配件': { tag: '数码', tagType: 'success' },
+  '生活用品': { tag: '生活', tagType: 'warning' },
+  '出行工具': { tag: '出行', tagType: 'success' },
+  '家用电器': { tag: '家电', tagType: 'danger' },
 }
 
-const items = ref<ListItem[]>([
-  { id: 1, title: '二手教材-高等数学', price: 15, desc: '九成新，几乎无笔记', tag: '教材', tagType: 'info' },
-  { id: 2, title: '机械键盘 IKBC C87', price: 80, desc: '樱桃红轴，使用一年', tag: '数码', tagType: 'success' },
-  { id: 3, title: '台灯 LED 护眼', price: 25, desc: '三档调光，配件齐全', tag: '生活', tagType: 'warning' },
-  { id: 4, title: '代取快递服务', price: 3, desc: '校内驿站代取，当日送达', tag: '服务', tagType: 'danger' },
-  { id: 5, title: '考研英语真题集', price: 20, desc: '2024版，含解析册', tag: '教材', tagType: 'info' },
-])
+function getTagInfo(category: string) {
+  return tagMap[category] || { tag: category, tagType: 'info' as const }
+}
+
+onMounted(async () => {
+  try {
+    const res = await getTrades()
+    items.value = res.data
+  } finally {
+    loading.value = false
+  }
+})
 
 const searchKeyword = ref('')
 
 const filteredItems = computed(() => {
   if (!searchKeyword.value) return items.value
+  const kw = searchKeyword.value
   return items.value.filter(
-    i => i.title.includes(searchKeyword.value) || i.desc.includes(searchKeyword.value)
+    i => i.title.includes(kw) || i.description.includes(kw) || i.category.includes(kw)
   )
 })
 
@@ -52,23 +62,37 @@ function goDetail(id: number) {
       />
     </div>
 
-    <div v-if="filteredItems.length === 0" class="empty-state">
+    <!-- 加载骨架 -->
+    <el-row v-if="loading" :gutter="16">
+      <el-col v-for="n in 6" :key="n" :xs="24" :sm="12" :md="8">
+        <el-card shadow="hover" class="item-card">
+          <el-skeleton :rows="3" animated />
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <div v-else-if="filteredItems.length === 0" class="empty-state">
       <el-empty description="未找到匹配的商品" />
     </div>
 
     <el-row v-else :gutter="16">
       <el-col v-for="item in filteredItems" :key="item.id" :xs="24" :sm="12" :md="8">
-        <el-card shadow="hover" class="item-card" @click="goDetail(item.id)">
-          <!-- 图片占位 -->
-          <div class="item-image">
-            <span class="image-icon">📦</span>
-          </div>
+        <el-card shadow="hover" class="item-card" @click="goDetail(Number(item.id))">
+          <ImageBox
+            :image-path="item.image"
+            fallback-emoji="📦"
+            height="140px"
+            border-radius="12px 12px 0 0"
+            icon-size="48px"
+          />
           <div class="item-body">
             <div class="item-header">
               <h3 class="item-title">{{ item.title }}</h3>
-              <el-tag :type="item.tagType" size="small" effect="plain">{{ item.tag }}</el-tag>
+              <el-tag :type="getTagInfo(item.category).tagType" size="small" effect="plain">
+                {{ getTagInfo(item.category).tag }}
+              </el-tag>
             </div>
-            <p class="item-desc">{{ item.desc }}</p>
+            <p class="item-desc">{{ item.description }}</p>
             <div class="item-footer">
               <span class="item-price">¥{{ item.price }}</span>
               <el-button type="primary" link :icon="Right">查看详情</el-button>
@@ -123,20 +147,6 @@ function goDetail(id: number) {
 
 .item-card :deep(.el-card__body) {
   padding: 0;
-}
-
-.item-image {
-  height: 140px;
-  background: linear-gradient(135deg, #e8f4fd 0%, #dce9f5 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px 12px 0 0;
-}
-
-.image-icon {
-  font-size: 48px;
-  opacity: 0.6;
 }
 
 .item-body {
@@ -203,14 +213,6 @@ function goDetail(id: number) {
     width: 100%;
   }
 
-  .item-image {
-    height: 120px;
-  }
-
-  .image-icon {
-    font-size: 40px;
-  }
-
   .item-body {
     padding: 12px 14px 14px;
   }
@@ -226,14 +228,6 @@ function goDetail(id: number) {
 
 /* ≤ 480px */
 @media (max-width: 480px) {
-  .item-image {
-    height: 100px;
-  }
-
-  .image-icon {
-    font-size: 36px;
-  }
-
   .item-title {
     font-size: 14px;
   }

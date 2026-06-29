@@ -1,29 +1,51 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { UserFilled } from '@element-plus/icons-vue'
+import { getMessages, markMessageRead, type MessageItem } from '../api/message'
+import { useUserStore } from '../stores/user'
 
-interface Message {
-  id: number
-  from: string
-  avatar?: string
-  content: string
-  time: string
-  unread: boolean
+const userStore = useUserStore()
+
+const messages = ref<MessageItem[]>([])
+const loading = ref(true)
+
+onMounted(async () => {
+  try {
+    const res = await getMessages(Number(userStore.userId))
+    messages.value = res.data
+  } finally {
+    loading.value = false
+  }
+})
+
+const unreadCount = computed(() => messages.value.filter(m => m.unread).length)
+
+/** 格式化时间戳为相对时间 */
+function formatRelativeTime(timeStr: string): string {
+  const now = new Date()
+  const target = new Date(timeStr)
+  const diffMs = now.getTime() - target.getTime()
+  const diffMin = Math.floor(diffMs / 60000)
+  const diffHour = Math.floor(diffMs / 3600000)
+  const diffDay = Math.floor(diffMs / 86400000)
+
+  if (diffMin < 1) return '刚刚'
+  if (diffMin < 60) return `${diffMin}分钟前`
+  if (diffHour < 24) return `${diffHour}小时前`
+  if (diffDay === 1) return '昨天'
+  if (diffDay < 7) return `${diffDay}天前`
+  return timeStr.slice(0, 10)
 }
 
-const messages = ref<Message[]>([
-  { id: 1, from: '张三', content: '你好，高等数学还在吗？我想买', time: '10分钟前', unread: true },
-  { id: 2, from: '李四', content: '键盘能便宜点吗？60出吗？', time: '30分钟前', unread: true },
-  { id: 3, from: '系统通知', content: '你的商品"台灯 LED 护眼"已通过审核', time: '2小时前', unread: false },
-  { id: 4, from: '王五', content: '好的，明天下午3点交易可以吗？', time: '昨天', unread: false },
-  { id: 5, from: '系统通知', content: '欢迎加入校园轻集市！请完善你的个人资料', time: '3天前', unread: false },
-])
-
-const unreadCount = ref(messages.value.filter(m => m.unread).length)
-
-function openChat(msg: Message) {
-  msg.unread = false
-  unreadCount.value = messages.value.filter(m => m.unread).length
+async function openChat(msg: MessageItem) {
+  if (msg.unread) {
+    try {
+      await markMessageRead(msg.id)
+    } catch {
+      // 即使 API 失败也更新本地状态
+    }
+    msg.unread = false
+  }
 }
 </script>
 
@@ -39,7 +61,14 @@ function openChat(msg: Message) {
       </el-badge>
     </div>
 
-    <div class="message-list">
+    <!-- 加载骨架 -->
+    <div v-if="loading" class="message-list">
+      <div v-for="n in 5" :key="n" class="message-item">
+        <el-skeleton :rows="2" animated style="flex:1" />
+      </div>
+    </div>
+
+    <div v-else class="message-list">
       <div
         v-for="msg in messages"
         :key="msg.id"
@@ -58,7 +87,7 @@ function openChat(msg: Message) {
         <div class="msg-body">
           <div class="msg-header">
             <span class="msg-from">{{ msg.from }}</span>
-            <span class="msg-time">{{ msg.time }}</span>
+            <span class="msg-time">{{ formatRelativeTime(msg.time) }}</span>
           </div>
           <p class="msg-content">{{ msg.content }}</p>
         </div>

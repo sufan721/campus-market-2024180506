@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { HomeFilled, List, Edit, ChatDotRound, UserFilled, Expand, Fold, Goods, Search, Connection, Service } from '@element-plus/icons-vue'
+import { useUserStore } from './stores/user'
 
 const route = useRoute()
+const userStore = useUserStore()
 const activeIndex = ref('/home')
 const drawerVisible = ref(false)
 
@@ -21,6 +23,11 @@ const isMobile = ref(window.innerWidth < 768)
 
 window.addEventListener('resize', () => {
   isMobile.value = window.innerWidth < 768
+})
+
+// 初始化用户（默认加载用户 ID=1）
+onMounted(() => {
+  userStore.loadUser(1)
 })
 
 interface NavItem {
