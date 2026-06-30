@@ -1,17 +1,25 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { UserFilled } from '@element-plus/icons-vue'
 import { getMessages, markMessageRead, type MessageItem } from '../api/message'
 import { useUserStore } from '../stores/user'
 
+const router = useRouter()
 const userStore = useUserStore()
 
 const messages = ref<MessageItem[]>([])
 const loading = ref(true)
 
+const isLoggedIn = computed(() => userStore.isLoggedIn)
+
 onMounted(async () => {
+  if (!isLoggedIn.value) {
+    loading.value = false
+    return
+  }
   try {
-    const res = await getMessages(Number(userStore.userId))
+    const res = await getMessages()
     messages.value = res.data
   } finally {
     loading.value = false
@@ -46,6 +54,9 @@ async function openChat(msg: MessageItem) {
     }
     msg.unread = false
   }
+  // 系统通知不跳转聊天
+  if (msg.from === '系统通知') return
+  router.push(`/chat/${encodeURIComponent(msg.from)}`)
 }
 </script>
 
@@ -61,8 +72,13 @@ async function openChat(msg: MessageItem) {
       </el-badge>
     </div>
 
+    <!-- 未登录 -->
+    <el-empty v-if="!isLoggedIn && !loading" description="请先登录后查看消息">
+      <el-button type="primary" @click="$router.push('/profile')">前往登录</el-button>
+    </el-empty>
+
     <!-- 加载骨架 -->
-    <div v-if="loading" class="message-list">
+    <div v-else-if="loading" class="message-list">
       <div v-for="n in 5" :key="n" class="message-item">
         <el-skeleton :rows="2" animated style="flex:1" />
       </div>
