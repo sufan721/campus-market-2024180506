@@ -27,6 +27,6 @@ export function getErrandById(id: number) {
   return http.get<ErrandItem>(`/errands/${id}`)
 }
 
-export function createErrand(data: Omit<ErrandItem, 'id'>) {
+export function createErrand(data: Omit<ErrandItem, 'id' | 'userId'>) {
   return http.post<ErrandItem>('/errands', data)
 }

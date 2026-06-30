@@ -26,6 +26,6 @@ export function getLostFoundById(id: number) {
   return http.get<LostFoundItem>(`/lostFounds/${id}`)
 }
 
-export function createLostFound(data: Omit<LostFoundItem, 'id'>) {
+export function createLostFound(data: Omit<LostFoundItem, 'id' | 'userId'>) {
   return http.post<LostFoundItem>('/lostFounds', data)
 }

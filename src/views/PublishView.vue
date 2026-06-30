@@ -177,13 +177,11 @@ async function submitPublish() {
   }
 
   submitting.value = true
-  const userId = userStore.userId
 
   try {
     switch (publishType.value) {
       case 'trade': {
         await createTrade({
-          userId,
           title: tradeForm.title,
           category: tradeForm.category,
           price: tradeForm.price!,
@@ -199,7 +197,6 @@ async function submitPublish() {
       }
       case 'lostFound': {
         await createLostFound({
-          userId,
           title: lostFoundForm.title,
           type: lostFoundForm.type,
           itemName: lostFoundForm.itemName,
@@ -214,7 +211,6 @@ async function submitPublish() {
       }
       case 'groupBuy': {
         await createGroupBuy({
-          userId,
           title: groupBuyForm.title,
           type: groupBuyForm.type,
           targetCount: groupBuyForm.targetCount!,
@@ -230,7 +226,6 @@ async function submitPublish() {
       }
       case 'errand': {
         await createErrand({
-          userId,
           title: errandForm.title,
           taskType: errandForm.taskType,
           reward: errandForm.reward!,
@@ -258,6 +253,12 @@ async function submitPublish() {
 
 <template>
   <div class="publish-page">
+    <!-- 未登录 -->
+    <el-empty v-if="!userStore.isLoggedIn" description="请先登录后发布信息">
+      <el-button type="primary" @click="$router.push('/profile')">前往登录</el-button>
+    </el-empty>
+
+    <template v-else>
     <div class="page-header">
       <h1>发布信息</h1>
       <p class="subtitle">
@@ -614,6 +615,7 @@ async function submitPublish() {
         </el-button>
       </el-form-item>
     </el-card>
+    </template>
   </div>
 </template>
 

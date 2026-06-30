@@ -27,6 +27,6 @@ export function getGroupBuyById(id: number) {
   return http.get<GroupBuyItem>(`/groupBuys/${id}`)
 }
 
-export function createGroupBuy(data: Omit<GroupBuyItem, 'id'>) {
+export function createGroupBuy(data: Omit<GroupBuyItem, 'id' | 'userId'>) {
   return http.post<GroupBuyItem>('/groupBuys', data)
 }
