@@ -1,105 +1,127 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, reactive, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { UserFilled, ArrowRight } from '@element-plus/icons-vue'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { useUserStore } from '@/stores/user'
-import { useFavoritesStore, type FavoriteItem } from '@/stores/favorites'
-import { getTradesByUser, type TradeItem } from '@/api/trade'
-import { getLostFoundsByUser, type LostFoundItem } from '@/api/lostFound'
-import { getGroupBuysByUser, type GroupBuyItem } from '@/api/groupBuy'
-import { getErrandsByUser, type ErrandItem } from '@/api/errand'
-import { getMessages, type MessageItem } from '@/api/message'
-import { getAllMyChats, type ChatMessage } from '@/api/chat'
-import ActivityHeatmap, { type ActivityDay } from '@/components/ActivityHeatmap.vue'
-import ImageBox from '@/components/ImageBox.vue'
+import { ref, onMounted, computed, reactive, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { UserFilled, ArrowRight } from "@element-plus/icons-vue";
+import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { useUserStore } from "@/stores/user";
+import { useFavoritesStore, type FavoriteItem } from "@/stores/favorites";
+import { getTradesByUser, type TradeItem } from "@/api/trade";
+import { getLostFoundsByUser, type LostFoundItem } from "@/api/lostFound";
+import { getGroupBuysByUser, type GroupBuyItem } from "@/api/groupBuy";
+import { getErrandsByUser, type ErrandItem } from "@/api/errand";
+import { getMessages, type MessageItem } from "@/api/message";
+import { getAllMyChats, type ChatMessage } from "@/api/chat";
+import ActivityHeatmap, { type ActivityDay } from "@/components/ActivityHeatmap.vue";
+import ImageBox from "@/components/ImageBox.vue";
 
-const router = useRouter()
-const route = useRoute()
-const userStore = useUserStore()
-const favoritesStore = useFavoritesStore()
+const router = useRouter();
+const route = useRoute();
+const userStore = useUserStore();
+const favoritesStore = useFavoritesStore();
 
 // ====== 已登录：数据 ======
 
-const myTrades = ref<TradeItem[]>([])
-const myLostFounds = ref<LostFoundItem[]>([])
-const myGroupBuys = ref<GroupBuyItem[]>([])
-const myErrands = ref<ErrandItem[]>([])
-const myMessages = ref<MessageItem[]>([])
-const myChats = ref<ChatMessage[]>([])
-const loadingItems = ref(false)
+const myTrades = ref<TradeItem[]>([]);
+const myLostFounds = ref<LostFoundItem[]>([]);
+const myGroupBuys = ref<GroupBuyItem[]>([]);
+const myErrands = ref<ErrandItem[]>([]);
+const myMessages = ref<MessageItem[]>([]);
+const myChats = ref<ChatMessage[]>([]);
+const loadingItems = ref(false);
 
 // Tab 切换
-const activeTab = ref<'published' | 'favorites'>('published')
+const activeTab = ref<"published" | "favorites">("published");
 
 const totalPublished = computed(
-  () => myTrades.value.length + myLostFounds.value.length + myGroupBuys.value.length + myErrands.value.length,
-)
+  () =>
+    myTrades.value.length +
+    myLostFounds.value.length +
+    myGroupBuys.value.length +
+    myErrands.value.length,
+);
 
 const stats = computed(() => [
-  { num: myTrades.value.length, label: '二手交易', color: '#409eff' },
-  { num: myLostFounds.value.length, label: '失物招领', color: '#67c23a' },
-  { num: myGroupBuys.value.length, label: '拼单搭子', color: '#e6a23c' },
-  { num: myErrands.value.length, label: '跑腿委托', color: '#f56c6c' },
-])
+  { num: myTrades.value.length, label: "二手交易", color: "#409eff" },
+  { num: myLostFounds.value.length, label: "失物招领", color: "#67c23a" },
+  { num: myGroupBuys.value.length, label: "拼单搭子", color: "#e6a23c" },
+  { num: myErrands.value.length, label: "跑腿委托", color: "#f56c6c" },
+]);
 
 // ====== 非交易类发布列表 ======
 
 interface MyItem {
-  id: number
-  title: string
-  type: string
-  category: string
-  time: string
+  id: number;
+  title: string;
+  type: string;
+  category: string;
+  time: string;
 }
 
 const nonTradeItems = computed<MyItem[]>(() => {
   const items: MyItem[] = [
-    ...myLostFounds.value.map((l) => ({ id: l.id, title: l.title, type: '失物招领', category: l.itemName, time: l.eventTime })),
-    ...myGroupBuys.value.map((g) => ({ id: g.id, title: g.title, type: '拼单搭子', category: g.type, time: g.deadline })),
-    ...myErrands.value.map((e) => ({ id: e.id, title: e.title, type: '跑腿委托', category: e.taskType, time: e.deadline })),
-  ]
-  items.sort((a, b) => b.time.localeCompare(a.time))
-  return items
-})
+    ...myLostFounds.value.map((l) => ({
+      id: l.id,
+      title: l.title,
+      type: "失物招领",
+      category: l.itemName,
+      time: l.eventTime,
+    })),
+    ...myGroupBuys.value.map((g) => ({
+      id: g.id,
+      title: g.title,
+      type: "拼单搭子",
+      category: g.type,
+      time: g.deadline,
+    })),
+    ...myErrands.value.map((e) => ({
+      id: e.id,
+      title: e.title,
+      type: "跑腿委托",
+      category: e.taskType,
+      time: e.deadline,
+    })),
+  ];
+  items.sort((a, b) => b.time.localeCompare(a.time));
+  return items;
+});
 
 // ====== 活动热力图 ======
 
 const activityData = computed<ActivityDay[]>(() => {
-  const dateMap = new Map<string, number>()
+  const dateMap = new Map<string, number>();
 
   function addDate(dateStr: string | undefined) {
-    if (!dateStr) return
-    const d = dateStr.slice(0, 10) // YYYY-MM-DD
-    dateMap.set(d, (dateMap.get(d) || 0) + 1)
+    if (!dateStr) return;
+    const d = dateStr.slice(0, 10); // YYYY-MM-DD
+    dateMap.set(d, (dateMap.get(d) || 0) + 1);
   }
 
   // 发布活动
-  for (const t of myTrades.value) addDate(t.publishTime)
-  for (const l of myLostFounds.value) addDate(l.eventTime)
-  for (const g of myGroupBuys.value) addDate(g.deadline)
-  for (const e of myErrands.value) addDate(e.deadline)
+  for (const t of myTrades.value) addDate(t.publishTime);
+  for (const l of myLostFounds.value) addDate(l.eventTime);
+  for (const g of myGroupBuys.value) addDate(g.deadline);
+  for (const e of myErrands.value) addDate(e.deadline);
 
   // 聊天活动
-  for (const m of myMessages.value) addDate(m.time)
-  for (const c of myChats.value) addDate(c.time)
+  for (const m of myMessages.value) addDate(m.time);
+  for (const c of myChats.value) addDate(c.time);
 
-  const result: ActivityDay[] = []
+  const result: ActivityDay[] = [];
   for (const [date, count] of dateMap) {
-    result.push({ date, count })
+    result.push({ date, count });
   }
-  result.sort((a, b) => a.date.localeCompare(b.date))
-  return result
-})
+  result.sort((a, b) => a.date.localeCompare(b.date));
+  return result;
+});
 
 // ====== 数据加载 ======
 
 async function loadMyItems() {
-  loadingItems.value = true
-  const uid = userStore.userId
+  loadingItems.value = true;
+  const uid = userStore.userId;
   if (!uid) {
-    loadingItems.value = false
-    return
+    loadingItems.value = false;
+    return;
   }
   try {
     const [t, l, g, e, msgs, chats] = await Promise.all([
@@ -109,24 +131,24 @@ async function loadMyItems() {
       getErrandsByUser(uid),
       getMessages(),
       getAllMyChats(),
-    ])
-    myTrades.value = t.data
-    myLostFounds.value = l.data
-    myGroupBuys.value = g.data
-    myErrands.value = e.data
-    myMessages.value = msgs.data
-    myChats.value = chats.data
+    ]);
+    myTrades.value = t.data;
+    myLostFounds.value = l.data;
+    myGroupBuys.value = g.data;
+    myErrands.value = e.data;
+    myMessages.value = msgs.data;
+    myChats.value = chats.data;
   } catch {
     // 静默失败
   } finally {
-    loadingItems.value = false
+    loadingItems.value = false;
   }
 }
 
 // ====== 收藏 ======
 
 function isTradeFavorited(id: number) {
-  return favoritesStore.isFavorited(id)
+  return favoritesStore.isFavorited(id);
 }
 
 function toggleTradeFavorite(item: TradeItem) {
@@ -140,121 +162,115 @@ function toggleTradeFavorite(item: TradeItem) {
     publishTime: item.publishTime,
     image: item.image,
     publisher: item.publisher,
-  })
-  ElMessage.success(nowFavorited ? '已收藏' : '已取消收藏')
+  });
+  ElMessage.success(nowFavorited ? "已收藏" : "已取消收藏");
 }
 
 function removeFavorite(id: number) {
-  favoritesStore.removeFavorite(id)
-  ElMessage.success('已取消收藏')
+  favoritesStore.removeFavorite(id);
+  ElMessage.success("已取消收藏");
 }
 
 function goTradeDetail(id: number) {
-  router.push(`/detail/trade/${id}`)
+  router.push(`/detail/trade/${id}`);
 }
 
 // ====== 登出 ======
 
 function handleLogout() {
-  favoritesStore.clear()
-  userStore.logout()
-  ElMessage.success('已退出登录')
+  favoritesStore.clear();
+  userStore.logout();
+  ElMessage.success("已退出登录");
 }
 
 // ====== 登录 / 注册视图 ======
 
-const authTab = ref<'login' | 'register'>('login')
-const loginFormRef = ref<FormInstance>()
-const registerFormRef = ref<FormInstance>()
-const authLoading = ref(false)
+const authTab = ref<"login" | "register">("login");
+const loginFormRef = ref<FormInstance>();
+const registerFormRef = ref<FormInstance>();
+const authLoading = ref(false);
 
-const loginForm = reactive({ studentId: '', password: '' })
+const loginForm = reactive({ studentId: "", password: "" });
 const registerForm = reactive({
-  studentId: '',
-  password: '',
-  confirmPassword: '',
-  name: '',
-  school: '',
-  department: '',
-  grade: '',
-  contact: '',
-})
+  studentId: "",
+  password: "",
+  confirmPassword: "",
+  name: "",
+});
 
 const loginRules: FormRules = {
   studentId: [
-    { required: true, message: '请输入学号', trigger: 'blur' },
-    { pattern: /^\d{10}$/, message: '学号为10位数字', trigger: 'blur' },
+    { required: true, message: "请输入学号", trigger: "blur" },
+    { pattern: /^\d{10}$/, message: "学号为10位数字", trigger: "blur" },
   ],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-}
+  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+};
 
 const validateConfirmPass = (_rule: unknown, value: string, callback: (err?: Error) => void) => {
   if (value !== registerForm.password) {
-    callback(new Error('两次输入的密码不一致'))
+    callback(new Error("两次输入的密码不一致"));
   } else {
-    callback()
+    callback();
   }
-}
+};
 
 const registerRules: FormRules = {
   studentId: [
-    { required: true, message: '请输入学号', trigger: 'blur' },
-    { pattern: /^\d{10}$/, message: '学号必须为10位数字（如2023010201）', trigger: 'blur' },
+    { required: true, message: "请输入学号", trigger: "blur" },
+    { pattern: /^\d{10}$/, message: "学号必须为10位数字（如2023010201）", trigger: "blur" },
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, message: '密码至少 6 位', trigger: 'blur' },
+    { required: true, message: "请输入密码", trigger: "blur" },
+    { min: 6, message: "密码至少 6 位", trigger: "blur" },
   ],
   confirmPassword: [
-    { required: true, message: '请再次输入密码', trigger: 'blur' },
-    { validator: validateConfirmPass, trigger: 'blur' },
+    { required: true, message: "请再次输入密码", trigger: "blur" },
+    { validator: validateConfirmPass, trigger: "blur" },
   ],
-  name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-}
+  name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
+};
 
 async function handleLogin() {
-  const valid = await loginFormRef.value?.validate().catch(() => false)
-  if (!valid) return
-  authLoading.value = true
+  const valid = await loginFormRef.value?.validate().catch(() => false);
+  if (!valid) return;
+  authLoading.value = true;
   try {
-    await userStore.doLogin({ studentId: loginForm.studentId, password: loginForm.password })
-    favoritesStore.load()
-    ElMessage.success('登录成功')
-    loadMyItems()
-    const redirect = route.query.redirect as string
-    if (redirect) router.push(redirect)
+    await userStore.doLogin({ studentId: loginForm.studentId, password: loginForm.password });
+    favoritesStore.load();
+    ElMessage.success("登录成功");
+    loadMyItems();
+    const redirect = route.query.redirect as string;
+    if (redirect) router.push(redirect);
   } catch (err: unknown) {
-    const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || '登录失败'
-    ElMessage.error(msg)
+    const msg =
+      (err as { response?: { data?: { error?: string } } })?.response?.data?.error || "登录失败";
+    ElMessage.error(msg);
   } finally {
-    authLoading.value = false
+    authLoading.value = false;
   }
 }
 
 async function handleRegister() {
-  const valid = await registerFormRef.value?.validate().catch(() => false)
-  if (!valid) return
-  authLoading.value = true
+  const valid = await registerFormRef.value?.validate().catch(() => false);
+  if (!valid) return;
+  authLoading.value = true;
   try {
     await userStore.doRegister({
       studentId: registerForm.studentId,
       password: registerForm.password,
       name: registerForm.name,
-      school: registerForm.school,
-      department: registerForm.department,
-      grade: registerForm.grade,
-      contact: registerForm.contact,
-    })
-    favoritesStore.load()
-    ElMessage.success('注册成功')
-    loadMyItems()
-    const redirect = route.query.redirect as string
-    if (redirect) router.push(redirect)
+    });
+    favoritesStore.load();
+    ElMessage.success("注册成功");
+    loadMyItems();
+    const redirect = route.query.redirect as string;
+    if (redirect) router.push(redirect);
   } catch (err: unknown) {
-    const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || '注册失败'
-    ElMessage.error(msg)
+    const msg =
+      (err as { response?: { data?: { error?: string } } })?.response?.data?.error || "注册失败";
+    ElMessage.error(msg);
   } finally {
-    authLoading.value = false
+    authLoading.value = false;
   }
 }
 
@@ -262,15 +278,18 @@ async function handleRegister() {
 
 onMounted(() => {
   if (userStore.isLoggedIn) {
-    favoritesStore.load()
-    loadMyItems()
+    favoritesStore.load();
+    loadMyItems();
   }
-})
+});
 
 // 监听登录态变化（退出时清空收藏）
-watch(() => userStore.isLoggedIn, (val) => {
-  if (!val) favoritesStore.clear()
-})
+watch(
+  () => userStore.isLoggedIn,
+  (val) => {
+    if (!val) favoritesStore.clear();
+  },
+);
 </script>
 
 <template>
@@ -297,7 +316,11 @@ watch(() => userStore.isLoggedIn, (val) => {
                 @keyup.enter="handleLogin"
               >
                 <el-form-item prop="studentId">
-                  <el-input v-model="loginForm.studentId" placeholder="学号（10位数字）" prefix-icon="User" />
+                  <el-input
+                    v-model="loginForm.studentId"
+                    placeholder="学号（10位数字）"
+                    prefix-icon="User"
+                  />
                 </el-form-item>
                 <el-form-item prop="password">
                   <el-input
@@ -319,9 +342,7 @@ watch(() => userStore.isLoggedIn, (val) => {
                   </el-button>
                 </el-form-item>
               </el-form>
-              <p class="auth-tip">
-                演示账号：2023010201 / 123456
-              </p>
+              <p class="auth-tip">演示账号：2023010201 / 123456</p>
             </el-tab-pane>
 
             <!-- 注册 -->
@@ -334,7 +355,10 @@ watch(() => userStore.isLoggedIn, (val) => {
                 size="large"
               >
                 <el-form-item prop="studentId">
-                  <el-input v-model="registerForm.studentId" placeholder="学号（10位数字，如2023010201）" />
+                  <el-input
+                    v-model="registerForm.studentId"
+                    placeholder="学号（10位数字，如2023010201）"
+                  />
                 </el-form-item>
                 <el-form-item prop="password">
                   <el-input
@@ -354,18 +378,6 @@ watch(() => userStore.isLoggedIn, (val) => {
                 </el-form-item>
                 <el-form-item prop="name">
                   <el-input v-model="registerForm.name" placeholder="姓名 *" />
-                </el-form-item>
-                <el-form-item prop="school">
-                  <el-input v-model="registerForm.school" placeholder="学校" />
-                </el-form-item>
-                <el-form-item prop="department">
-                  <el-input v-model="registerForm.department" placeholder="学院 / 专业" />
-                </el-form-item>
-                <el-form-item prop="grade">
-                  <el-input v-model="registerForm.grade" placeholder="年级（如 2024级）" />
-                </el-form-item>
-                <el-form-item prop="contact">
-                  <el-input v-model="registerForm.contact" placeholder="联系方式（QQ / 微信等）" />
                 </el-form-item>
                 <el-form-item>
                   <el-button
@@ -398,14 +410,16 @@ watch(() => userStore.isLoggedIn, (val) => {
           <div class="user-meta">
             <h2>{{ userStore.currentUser?.name }}</h2>
             <p>{{ userStore.currentUser?.department }} · {{ userStore.currentUser?.grade }}</p>
-            <el-tag size="small" effect="plain">加入于 {{ userStore.currentUser?.joinDate }}</el-tag>
+            <el-tag size="small" effect="plain"
+              >加入于 {{ userStore.currentUser?.joinDate }}</el-tag
+            >
           </div>
         </div>
       </el-card>
 
       <!-- 发布统计 -->
       <el-row :gutter="14" class="stats-row">
-        <el-col :xs="6" v-for="s in stats" :key="s.label">
+        <el-col :xs="12" :sm="6" v-for="s in stats" :key="s.label">
           <el-card shadow="hover" class="stat-card">
             <div class="stat-content">
               <span class="stat-num" :style="{ color: s.color }">{{ s.num }}</span>
@@ -417,7 +431,7 @@ watch(() => userStore.isLoggedIn, (val) => {
 
       <!-- 活动热力图 -->
       <el-card shadow="never" class="section-card">
-        <ActivityHeatmap :activities="activityData" :week-count="20" />
+        <ActivityHeatmap :activities="activityData" :week-count="53" />
       </el-card>
 
       <!-- Tab：我的发布 / 我的收藏 -->
@@ -430,7 +444,8 @@ watch(() => userStore.isLoggedIn, (val) => {
             </template>
 
             <div v-if="totalPublished === 0 && !loadingItems" class="empty-hint">
-              暂无发布内容，去<a href="javascript:void(0)" @click="$router.push('/publish')">发布</a>第一条吧！
+              暂无发布内容，去<a href="javascript:void(0)" @click="$router.push('/publish')">发布</a
+              >第一条吧！
             </div>
 
             <!-- 二手交易卡片网格 -->
@@ -471,7 +486,7 @@ watch(() => userStore.isLoggedIn, (val) => {
                       class="fav-btn"
                       @click.stop="toggleTradeFavorite(item)"
                     >
-                      {{ isTradeFavorited(item.id) ? '❤️' : '🤍' }}
+                      {{ isTradeFavorited(item.id) ? "❤️" : "🤍" }}
                     </el-button>
                   </div>
                 </article>
@@ -506,7 +521,8 @@ watch(() => userStore.isLoggedIn, (val) => {
             </template>
 
             <div v-if="favoritesStore.favorites.length === 0" class="empty-hint">
-              暂无收藏，去<a href="javascript:void(0)" @click="$router.push('/trades')">逛逛</a>二手交易吧！
+              暂无收藏，去<a href="javascript:void(0)" @click="$router.push('/trades')">逛逛</a
+              >二手交易吧！
             </div>
 
             <div v-else class="trade-grid">
@@ -726,7 +742,9 @@ watch(() => userStore.isLoggedIn, (val) => {
   border-radius: 14px;
   background: #fff;
   border: 1px solid #e5e7eb;
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
   cursor: pointer;
   overflow: hidden;
   position: relative;
@@ -867,9 +885,18 @@ watch(() => userStore.isLoggedIn, (val) => {
   flex-shrink: 0;
 }
 
-.tag-失物招领 { background: #f0f9eb; color: #67c23a; }
-.tag-拼单搭子 { background: #fdf6ec; color: #e6a23c; }
-.tag-跑腿委托 { background: #fef0f0; color: #f56c6c; }
+.tag-失物招领 {
+  background: #f0f9eb;
+  color: #67c23a;
+}
+.tag-拼单搭子 {
+  background: #fdf6ec;
+  color: #e6a23c;
+}
+.tag-跑腿委托 {
+  background: #fef0f0;
+  color: #f56c6c;
+}
 
 .item-title {
   font-size: 14px;
