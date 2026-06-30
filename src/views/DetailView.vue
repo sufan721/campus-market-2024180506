@@ -2,7 +2,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, User } from '@element-plus/icons-vue'
+
 import { ElMessage } from 'element-plus'
+import { useUserStore } from '../stores/user'
+import { useFavoritesStore } from '../stores/favorites'
 import { getTradeById, type TradeItem } from '../api/trade'
 import { getLostFoundById, type LostFoundItem } from '../api/lostFound'
 import { getGroupBuyById, type GroupBuyItem } from '../api/groupBuy'
@@ -11,6 +14,8 @@ import ImageBox from '../components/ImageBox.vue'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
+const favoritesStore = useFavoritesStore()
 
 type ItemType = 'trade' | 'lostfound' | 'groupbuy' | 'errand'
 
@@ -71,7 +76,37 @@ function goBack() {
 }
 
 function handleContact(contactName?: string) {
-  ElMessage.success(`已向「${contactName || '发布者'}」发送消息`)
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录后再联系')
+    router.push('/profile')
+    return
+  }
+  const target = contactName || '发布者'
+  router.push(`/chat/${encodeURIComponent(target)}`)
+}
+
+const isTradeFavorited = computed(() => {
+  return trade.value ? favoritesStore.isFavorited(trade.value.id) : false
+})
+
+function toggleFavorite() {
+  if (!trade.value) return
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录后再收藏')
+    return
+  }
+  const nowFavorited = favoritesStore.toggleFavorite({
+    id: trade.value.id,
+    title: trade.value.title,
+    category: trade.value.category,
+    price: trade.value.price,
+    condition: trade.value.condition,
+    location: trade.value.location,
+    publishTime: trade.value.publishTime,
+    image: trade.value.image,
+    publisher: trade.value.publisher,
+  })
+  ElMessage.success(nowFavorited ? '已收藏' : '已取消收藏')
 }
 </script>
 
@@ -136,6 +171,13 @@ function handleContact(contactName?: string) {
       <div class="actions">
         <el-button type="primary" size="large" @click="handleContact(trade.publisher)">
           💬 联系卖家
+        </el-button>
+        <el-button
+          :type="isTradeFavorited ? 'danger' : 'default'"
+          size="large"
+          @click="toggleFavorite"
+        >
+          {{ isTradeFavorited ? '❤️ 已收藏' : '🤍 收藏' }}
         </el-button>
         <el-button size="large" @click="goBack">返回列表</el-button>
       </div>
