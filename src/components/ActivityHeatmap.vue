@@ -1,15 +1,10 @@
 <template>
   <div class="heatmap-wrapper">
-    <div class="heatmap-header">
-      <span class="heatmap-title">📊 活动热力图</span>
-      <span class="heatmap-subtitle">近 20 周活动分布</span>
-    </div>
-
     <div class="heatmap-body">
       <!-- 月份标签行 -->
-      <div class="heatmap-months">
-        <span class="day-label-placeholder" />
-        <div class="months-row">
+      <div class="months-row">
+        <div class="month-spacer" />
+        <div class="months-inner">
           <span
             v-for="(m, i) in monthLabels"
             :key="i"
@@ -21,8 +16,8 @@
         </div>
       </div>
 
-      <div class="heatmap-grid-row">
-        <!-- 星期标签列 -->
+      <!-- 主网格：星期标签 + 格子 -->
+      <div class="grid-row">
         <div class="day-labels">
           <span
             v-for="(d, i) in dayLabels"
@@ -34,7 +29,6 @@
           </span>
         </div>
 
-        <!-- 格子矩阵 -->
         <div class="cells-grid">
           <div
             v-for="cell in cells"
@@ -43,33 +37,26 @@
             :class="{ 'cell--today': cell.isToday }"
             :style="{ backgroundColor: cell.color, gridColumnStart: cell.col, gridRowStart: cell.row }"
             :title="cell.tooltip"
-            @mouseenter="hoveredCell = cell"
-            @mouseleave="hoveredCell = null"
           />
         </div>
       </div>
     </div>
 
-    <!-- Tooltip -->
-    <div v-if="hoveredCell" class="heatmap-tooltip">
-      {{ hoveredCell.tooltip }}
-    </div>
-
     <!-- 图例 -->
     <div class="heatmap-legend">
-      <span class="legend-label">少</span>
+      <span class="legend-label">Less</span>
       <span class="legend-block" style="background:#ebedf0" />
       <span class="legend-block" style="background:#9be9a8" />
       <span class="legend-block" style="background:#40c463" />
       <span class="legend-block" style="background:#30a14e" />
       <span class="legend-block" style="background:#216e39" />
-      <span class="legend-label">多</span>
+      <span class="legend-label">More</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 export interface ActivityDay {
   date: string   // 'YYYY-MM-DD'
@@ -81,12 +68,10 @@ const props = withDefaults(defineProps<{
   /** 展示多少周（从今天往前算） */
   weekCount?: number
 }>(), {
-  weekCount: 20,
+  weekCount: 53,
 })
 
 const gridCols = computed(() => props.weekCount)
-
-const hoveredCell = ref<CellData | null>(null)
 
 // ====== 内部数据结构 ======
 
@@ -168,7 +153,9 @@ const cells = computed<CellData[]>(() => {
   return result
 })
 
-/** 生成月份标签：收集每一列对应哪个月份 */
+/** 生成月份标签：收集每一列对应哪个月份（GitHub 风格短英文） */
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
 const monthLabels = computed(() => {
   const cols = props.weekCount
   const today = new Date()
@@ -189,7 +176,7 @@ const monthLabels = computed(() => {
     const month = cur.getMonth()
     if (month !== lastMonth) {
       labels.push({
-        label: `${cur.getFullYear()}-${String(month + 1).padStart(2, '0')}`,
+        label: MONTH_NAMES[month],
         col,
       })
       lastMonth = month
@@ -199,11 +186,11 @@ const monthLabels = computed(() => {
   return labels
 })
 
-/** 星期标签：周一/三/五 */
+/** 星期标签：Mon / Wed / Fri */
 const dayLabels = computed(() => [
-  { label: '一', row: 1 },
-  { label: '三', row: 3 },
-  { label: '五', row: 5 },
+  { label: 'Mon', row: 1 },
+  { label: 'Wed', row: 3 },
+  { label: 'Fri', row: 5 },
 ])
 
 function toDateString(d: Date): string {
@@ -219,88 +206,74 @@ function toDateString(d: Date): string {
   position: relative;
 }
 
-.heatmap-header {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.heatmap-title {
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.heatmap-subtitle {
-  font-size: 12px;
-  color: #999;
-}
-
 .heatmap-body {
   overflow-x: auto;
   padding-bottom: 4px;
 }
 
-.heatmap-months {
+/* ====== 月份行 ====== */
+.months-row {
   display: flex;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
-.day-label-placeholder {
-  width: 24px;
+.month-spacer {
+  width: 32px;
   flex-shrink: 0;
 }
 
-.months-row {
-  display: grid;
-  grid-template-columns: repeat(v-bind(gridCols), 13px);
-  gap: 3px;
+.months-inner {
   flex: 1;
-  position: relative;
+  display: grid;
+  grid-template-columns: repeat(v-bind(gridCols), 1fr);
+  gap: 3px;
 }
 
 .month-label {
   font-size: 10px;
-  color: #999;
+  color: #767676;
   white-space: nowrap;
 }
 
-.heatmap-grid-row {
+/* ====== 主网格行（星期 + 格子） ====== */
+.grid-row {
   display: flex;
+  align-items: stretch;
 }
 
 .day-labels {
   display: grid;
-  grid-template-rows: repeat(7, 13px);
+  grid-template-rows: repeat(7, 1fr);
   gap: 3px;
-  width: 24px;
+  width: 32px;
   flex-shrink: 0;
-  margin-right: 4px;
 }
 
 .day-label {
   font-size: 10px;
-  color: #999;
-  line-height: 13px;
-  text-align: right;
-  padding-right: 3px;
+  color: #767676;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
 }
 
 .cells-grid {
+  flex: 1;
   display: grid;
-  grid-template-rows: repeat(7, 13px);
-  grid-template-columns: repeat(v-bind(gridCols), 13px);
+  grid-template-rows: repeat(7, auto);
+  grid-template-columns: repeat(v-bind(gridCols), 1fr);
   gap: 3px;
 }
 
+/* ====== 格子 ====== */
 .cell {
-  width: 13px;
-  height: 13px;
+  aspect-ratio: 1;
   border-radius: 2px;
   cursor: pointer;
   transition: outline 0.1s;
-  outline: 1px solid transparent;
-  outline-offset: 0;
+  outline: 1px solid rgba(27, 31, 35, 0.06);
+  outline-offset: -1px;
 }
 
 .cell:hover {
@@ -312,21 +285,7 @@ function toDateString(d: Date): string {
   outline-width: 2px;
 }
 
-.heatmap-tooltip {
-  position: absolute;
-  top: -34px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #333;
-  color: #fff;
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 6px;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 10;
-}
-
+/* ====== 图例 ====== */
 .heatmap-legend {
   display: flex;
   align-items: center;
@@ -336,9 +295,9 @@ function toDateString(d: Date): string {
 }
 
 .legend-label {
-  font-size: 11px;
-  color: #999;
-  margin: 0 3px;
+  font-size: 10px;
+  color: #767676;
+  margin: 0 4px;
 }
 
 .legend-block {
