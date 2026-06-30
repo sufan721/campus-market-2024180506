@@ -359,17 +359,123 @@
       "description": "代购洗发水、牙膏等日用品，清单已列好，约50元。"
     }
   ],
-  "messages": [
+  "chatMessages": [
     {
       "id": 1,
+      "userId": 1,
+      "contactName": "李四",
+      "content": "你好，高等数学教材还在吗？我想买",
+      "time": "2026-06-29 09:30",
+      "direction": "received"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "contactName": "李四",
+      "content": "在的，八成新，有一些笔记但不影响使用",
+      "time": "2026-06-29 09:32",
+      "direction": "sent"
+    },
+    {
+      "id": 3,
+      "userId": 1,
+      "contactName": "李四",
+      "content": "好的，能便宜点吗？15元可以吗？",
+      "time": "2026-06-29 09:35",
+      "direction": "received"
+    },
+    {
+      "id": 4,
+      "userId": 1,
+      "contactName": "李四",
+      "content": "可以，那就15元吧。什么时候方便交易？",
+      "time": "2026-06-29 09:38",
+      "direction": "sent"
+    },
+    {
+      "id": 5,
+      "userId": 1,
+      "contactName": "李四",
+      "content": "今天下午3点图书馆门口见？",
+      "time": "2026-06-29 09:40",
+      "direction": "received"
+    },
+    {
+      "id": 6,
+      "userId": 1,
+      "contactName": "李四",
+      "content": "没问题，下午见！",
+      "time": "2026-06-29 09:42",
+      "direction": "sent"
+    },
+    {
+      "id": 7,
+      "userId": 1,
+      "contactName": "王五",
+      "content": "键盘能便宜点吗？60出吗？",
+      "time": "2026-06-29 08:15",
+      "direction": "received"
+    },
+    {
+      "id": 8,
+      "userId": 1,
+      "contactName": "王五",
+      "content": "这个键盘是Cherry轴，原价200多的，80最低了",
+      "time": "2026-06-29 08:20",
+      "direction": "sent"
+    },
+    {
+      "id": 9,
+      "userId": 1,
+      "contactName": "王五",
+      "content": "70行不行？诚心要",
+      "time": "2026-06-29 08:22",
+      "direction": "received"
+    },
+    {
+      "id": 10,
+      "userId": 1,
+      "contactName": "赵六",
+      "content": "你好，我对你的小冰箱感兴趣",
+      "time": "2026-06-27 15:30",
+      "direction": "received"
+    },
+    {
+      "id": 11,
+      "userId": 1,
+      "contactName": "赵六",
+      "content": "你好！冰箱还在，制冷效果很好的",
+      "time": "2026-06-27 15:35",
+      "direction": "sent"
+    },
+    {
+      "id": 12,
+      "userId": 1,
+      "contactName": "赵六",
+      "content": "好的，明天下午3点交易可以吗？",
+      "time": "2026-06-27 16:45",
+      "direction": "received"
+    },
+    {
+      "id": 13,
+      "userId": 1,
+      "contactName": "赵六",
+      "content": "可以，南区3栋楼下见",
+      "time": "2026-06-27 16:50",
+      "direction": "sent"
+    }
+  ],
+  "messages": [
+    {
+      "id": "1",
       "userId": 1,
       "from": "李四",
       "content": "你好，高等数学教材还在吗？我想买",
       "time": "2026-06-29 09:30",
-      "unread": true
+      "unread": false
     },
     {
-      "id": 2,
+      "id": "2",
       "userId": 1,
       "from": "王五",
       "content": "键盘能便宜点吗？60出吗？",
@@ -377,7 +483,7 @@
       "unread": true
     },
     {
-      "id": 3,
+      "id": "3",
       "userId": 1,
       "from": "系统通知",
       "content": "你的商品\"台灯 LED 护眼\"已通过审核",
@@ -385,7 +491,7 @@
       "unread": false
     },
     {
-      "id": 4,
+      "id": "4",
       "userId": 1,
       "from": "赵六",
       "content": "好的，明天下午3点交易可以吗？",
@@ -393,7 +499,7 @@
       "unread": false
     },
     {
-      "id": 5,
+      "id": "5",
       "userId": 1,
       "from": "系统通知",
       "content": "欢迎加入校园轻集市！请完善你的个人资料",
@@ -408,20 +514,61 @@
     "orderCount": 2341,
     "activeToday": 89,
     "weeklyData": [
-      { "day": "一", "count": 34 },
-      { "day": "二", "count": 42 },
-      { "day": "三", "count": 28 },
-      { "day": "四", "count": 56 },
-      { "day": "五", "count": 48 },
-      { "day": "六", "count": 22 },
-      { "day": "日", "count": 18 }
+      {
+        "day": "一",
+        "count": 34
+      },
+      {
+        "day": "二",
+        "count": 42
+      },
+      {
+        "day": "三",
+        "count": 28
+      },
+      {
+        "day": "四",
+        "count": 56
+      },
+      {
+        "day": "五",
+        "count": 48
+      },
+      {
+        "day": "六",
+        "count": 22
+      },
+      {
+        "day": "日",
+        "count": 18
+      }
     ],
     "categories": [
-      { "name": "二手教材", "count": 124, "color": "#409eff" },
-      { "name": "数码配件", "count": 98, "color": "#67c23a" },
-      { "name": "生活用品", "count": 156, "color": "#e6a23c" },
-      { "name": "出行工具", "count": 45, "color": "#f56c6c" },
-      { "name": "其他", "count": 144, "color": "#909399" }
+      {
+        "name": "二手教材",
+        "count": 124,
+        "color": "#409eff"
+      },
+      {
+        "name": "数码配件",
+        "count": 98,
+        "color": "#67c23a"
+      },
+      {
+        "name": "生活用品",
+        "count": 156,
+        "color": "#e6a23c"
+      },
+      {
+        "name": "出行工具",
+        "count": 45,
+        "color": "#f56c6c"
+      },
+      {
+        "name": "其他",
+        "count": 144,
+        "color": "#909399"
+      }
     ]
   },
   "$schema": "./node_modules/json-server/schema.json"
