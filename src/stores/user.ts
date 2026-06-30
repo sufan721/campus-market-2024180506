@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { getUserById, type UserInfo as ApiUserInfo } from '../api/user'
+import { getUserById, login, register, getMe, type UserInfo as ApiUserInfo, type LoginParams, type RegisterParams } from '../api/user'
 
 export interface UserInfo {
   id: number
@@ -15,40 +15,91 @@ export interface UserInfo {
 
 export const useUserStore = defineStore('user', () => {
   const currentUser = ref<UserInfo | null>(null)
+  const token = ref<string | null>(localStorage.getItem('auth_token'))
   const loading = ref(false)
 
   const userId = computed(() => currentUser.value?.id ?? null)
+  const isLoggedIn = computed(() => !!token.value && !!currentUser.value)
 
-  /** 从 API 加载用户信息 */
+  /** 启动时从 localStorage 恢复登录态 */
+  async function initAuth() {
+    if (!token.value) return
+    try {
+      const res = await getMe()
+      currentUser.value = mapUser(res.data)
+    } catch {
+      // token 过期或无效，清除
+      clearAuth()
+    }
+  }
+
+  /** 登录 */
+  async function doLogin(params: LoginParams) {
+    const res = await login(params)
+    setAuth(res.data.token, res.data.user)
+    return res.data
+  }
+
+  /** 注册 */
+  async function doRegister(params: RegisterParams) {
+    const res = await register(params)
+    setAuth(res.data.token, res.data.user)
+    return res.data
+  }
+
+  /** 登出 */
+  function logout() {
+    clearAuth()
+  }
+
+  /** 从 API 加载用户信息（公开查看他人资料） */
   async function loadUser(id: number | string) {
     loading.value = true
     try {
       const res = await getUserById(id)
-      currentUser.value = {
-        id: Number(res.data.id),
-        name: res.data.name,
-        avatar: res.data.avatar,
-        school: res.data.school,
-        department: res.data.department,
-        grade: res.data.grade,
-        joinDate: res.data.joinDate,
-        contact: res.data.contact,
-      }
+      return mapUser(res.data)
     } finally {
       loading.value = false
     }
   }
 
-  /** 切换用户（仅用于 Demo 演示） */
-  async function switchUser(user: UserInfo) {
-    currentUser.value = user
+  // ====== 内部辅助 ======
+
+  function setAuth(newToken: string, user: ApiUserInfo & { username?: string }) {
+    token.value = newToken
+    localStorage.setItem('auth_token', newToken)
+    currentUser.value = mapUser(user)
+  }
+
+  function clearAuth() {
+    token.value = null
+    currentUser.value = null
+    localStorage.removeItem('auth_token')
+  }
+
+  function mapUser(raw: ApiUserInfo): UserInfo {
+    return {
+      id: Number(raw.id),
+      name: raw.name,
+      avatar: raw.avatar,
+      school: raw.school,
+      department: raw.department,
+      grade: raw.grade,
+      joinDate: raw.joinDate,
+      contact: raw.contact,
+    }
   }
 
   return {
     currentUser,
-    userId,
+    token,
     loading,
+    userId,
+    isLoggedIn,
+    initAuth,
+    doLogin,
+    doRegister,
+    logout,
     loadUser,
-    switchUser,
   }
 })

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import HomeView from '@/views/HomeView.vue'
 
 const router = createRouter({
@@ -59,6 +60,11 @@ const router = createRouter({
       component: () => import('../views/ProfileView.vue'),
     },
     {
+      path: '/chat/:contactName',
+      name: 'Chat',
+      component: () => import('../views/ChatView.vue'),
+    },
+    {
       path: '/board',
       name: 'Board',
       component: () => import('../views/BoardView.vue'),
@@ -66,4 +72,25 @@ const router = createRouter({
   ],
 })
 
+// 路由守卫：需要登录才能访问的页面
+const protectedPaths = ['/publish', '/message', '/chat']
+
+router.beforeEach(async (to, _from, next) => {
+  const isProtected = protectedPaths.some(
+    (p) => to.path === p || to.path.startsWith(p + '/'),
+  )
+  if (isProtected) {
+    // 动态导入 store 避免循环依赖
+    const { useUserStore } = await import('@/stores/user')
+    const userStore = useUserStore()
+    if (!userStore.isLoggedIn) {
+      ElMessage.warning('请先登录')
+      next({ path: '/profile', query: { redirect: to.fullPath } })
+      return
+    }
+  }
+  next()
+})
+
 export default router
+
