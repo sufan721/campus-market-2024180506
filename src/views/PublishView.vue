@@ -154,6 +154,15 @@ function now(): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
+// ========== 图片上传（通用） ==========
+function handleImageUpload(file: any, target: { image: string }) {
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    target.image = (e.target?.result as string) || ''
+  }
+  reader.readAsDataURL(file.raw!)
+}
+
 // ========== 切换类型时重置表单 ==========
 function onTypeChange() {
   formRef.value?.resetFields()
@@ -326,8 +335,31 @@ async function submitPublish() {
           <el-input v-model="tradeForm.location" placeholder="如：东区宿舍、图书馆门口" clearable />
         </el-form-item>
 
-        <el-form-item label="图片链接（可选）" prop="image">
-          <el-input v-model="tradeForm.image" placeholder="如：/images/my-item.jpg（图片请放在 public/images/ 目录下）" clearable />
+        <el-form-item label="商品照片（可选）" prop="image">
+          <div class="upload-wrap">
+            <el-upload
+              :auto-upload="false"
+              :show-file-list="false"
+              :on-change="(f: any) => handleImageUpload(f, tradeForm)"
+              accept="image/*"
+              drag
+            >
+              <div v-if="tradeForm.image" class="upload-preview">
+                <img :src="tradeForm.image" alt="预览" />
+                <div class="upload-mask">
+                  <span>点击更换图片</span>
+                </div>
+              </div>
+              <div v-else class="upload-placeholder">
+                <el-icon :size="32" color="#c0c4cc"><UploadFilled /></el-icon>
+                <p>将图片拖到此处，或点击上传</p>
+                <p class="upload-hint">支持 jpg、png 格式</p>
+              </div>
+            </el-upload>
+            <el-button v-if="tradeForm.image" text type="danger" size="small" @click="tradeForm.image = ''">
+              移除图片
+            </el-button>
+          </div>
         </el-form-item>
 
         <el-form-item label="详细描述" prop="description">
@@ -377,8 +409,31 @@ async function submitPublish() {
           <el-input v-model="lostFoundForm.contact" placeholder="站内消息联系" clearable />
         </el-form-item>
 
-        <el-form-item label="图片链接（可选）" prop="image">
-          <el-input v-model="lostFoundForm.image" placeholder="如：/images/my-item.jpg" clearable />
+        <el-form-item label="物品照片（可选）" prop="image">
+          <div class="upload-wrap">
+            <el-upload
+              :auto-upload="false"
+              :show-file-list="false"
+              :on-change="(f: any) => handleImageUpload(f, lostFoundForm)"
+              accept="image/*"
+              drag
+            >
+              <div v-if="lostFoundForm.image" class="upload-preview">
+                <img :src="lostFoundForm.image" alt="预览" />
+                <div class="upload-mask">
+                  <span>点击更换图片</span>
+                </div>
+              </div>
+              <div v-else class="upload-placeholder">
+                <el-icon :size="32" color="#c0c4cc"><UploadFilled /></el-icon>
+                <p>将图片拖到此处，或点击上传</p>
+                <p class="upload-hint">支持 jpg、png 格式</p>
+              </div>
+            </el-upload>
+            <el-button v-if="lostFoundForm.image" text type="danger" size="small" @click="lostFoundForm.image = ''">
+              移除图片
+            </el-button>
+          </div>
         </el-form-item>
 
         <el-form-item label="详细描述" prop="description">
@@ -436,8 +491,31 @@ async function submitPublish() {
           <el-input v-model="groupBuyForm.description" type="textarea" :rows="4" maxlength="500" show-word-limit placeholder="AA 制，人数够后统一预约。" />
         </el-form-item>
 
-        <el-form-item label="图片链接（可选）" prop="image">
-          <el-input v-model="groupBuyForm.image" placeholder="如：/images/group-buy.jpg" clearable />
+        <el-form-item label="活动照片（可选）" prop="image">
+          <div class="upload-wrap">
+            <el-upload
+              :auto-upload="false"
+              :show-file-list="false"
+              :on-change="(f: any) => handleImageUpload(f, groupBuyForm)"
+              accept="image/*"
+              drag
+            >
+              <div v-if="groupBuyForm.image" class="upload-preview">
+                <img :src="groupBuyForm.image" alt="预览" />
+                <div class="upload-mask">
+                  <span>点击更换图片</span>
+                </div>
+              </div>
+              <div v-else class="upload-placeholder">
+                <el-icon :size="32" color="#c0c4cc"><UploadFilled /></el-icon>
+                <p>将图片拖到此处，或点击上传</p>
+                <p class="upload-hint">支持 jpg、png 格式</p>
+              </div>
+            </el-upload>
+            <el-button v-if="groupBuyForm.image" text type="danger" size="small" @click="groupBuyForm.image = ''">
+              移除图片
+            </el-button>
+          </div>
         </el-form-item>
       </el-form>
 
@@ -491,8 +569,31 @@ async function submitPublish() {
           <el-input v-model="errandForm.deadline" placeholder="2026-06-03 19:00" clearable />
         </el-form-item>
 
-        <el-form-item label="图片链接（可选）" prop="image">
-          <el-input v-model="errandForm.image" placeholder="如：/images/errand.jpg" clearable />
+        <el-form-item label="任务照片（可选）" prop="image">
+          <div class="upload-wrap">
+            <el-upload
+              :auto-upload="false"
+              :show-file-list="false"
+              :on-change="(f: any) => handleImageUpload(f, errandForm)"
+              accept="image/*"
+              drag
+            >
+              <div v-if="errandForm.image" class="upload-preview">
+                <img :src="errandForm.image" alt="预览" />
+                <div class="upload-mask">
+                  <span>点击更换图片</span>
+                </div>
+              </div>
+              <div v-else class="upload-placeholder">
+                <el-icon :size="32" color="#c0c4cc"><UploadFilled /></el-icon>
+                <p>将图片拖到此处，或点击上传</p>
+                <p class="upload-hint">支持 jpg、png 格式</p>
+              </div>
+            </el-upload>
+            <el-button v-if="errandForm.image" text type="danger" size="small" @click="errandForm.image = ''">
+              移除图片
+            </el-button>
+          </div>
         </el-form-item>
 
         <el-form-item label="详细描述" prop="description">
@@ -565,6 +666,61 @@ async function submitPublish() {
   font-weight: 600;
   color: #333;
   flex-shrink: 0;
+}
+
+/* ========== 图片上传 ========== */
+.upload-wrap {
+  width: 100%;
+}
+
+.upload-placeholder {
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.upload-placeholder p {
+  margin: 8px 0 0;
+  color: #999;
+  font-size: 14px;
+}
+
+.upload-hint {
+  font-size: 12px !important;
+  color: #bbb !important;
+}
+
+.upload-preview {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.upload-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.upload-preview:hover .upload-mask {
+  opacity: 1;
+}
+
+.upload-mask span {
+  color: #fff;
+  font-size: 13px;
 }
 
 /* ========== RESPONSIVE ========== */

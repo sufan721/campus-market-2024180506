@@ -1,30 +1,44 @@
 <template>
   <article class="item-card" @click="$emit('click')">
-    <div class="item-card__header">
-      <h3>{{ title }}</h3>
-      <span v-if="tag" class="tag">{{ tag }}</span>
-    </div>
+    <ImageBox
+      v-if="image !== undefined"
+      :image-path="image"
+      :fallback-emoji="fallbackEmoji"
+      height="140px"
+      border-radius="12px 12px 0 0"
+      icon-size="48px"
+    />
+    <div class="item-card__body">
+      <div class="item-card__header">
+        <h3>{{ title }}</h3>
+        <span v-if="tag" class="tag">{{ tag }}</span>
+      </div>
 
-    <p class="description">{{ description }}</p>
+      <p class="description">{{ description }}</p>
 
-    <div class="meta">
-      <span v-if="location">地点：{{ location }}</span>
-      <span v-if="time">时间：{{ time }}</span>
-    </div>
+      <div class="meta">
+        <span v-if="location">地点：{{ location }}</span>
+        <span v-if="time">时间：{{ time }}</span>
+      </div>
 
-    <div v-if="$slots.footer" class="footer">
-      <slot name="footer" />
+      <div v-if="$slots.footer" class="footer">
+        <slot name="footer" />
+      </div>
     </div>
   </article>
 </template>
 
 <script setup lang="ts">
+import ImageBox from './ImageBox.vue'
+
 defineProps<{
   title: string
   description: string
   tag?: string
   location?: string
   time?: string
+  image?: string
+  fallbackEmoji?: string
 }>()
 
 defineEmits<{
@@ -34,17 +48,21 @@ defineEmits<{
 
 <style scoped>
 .item-card {
-  padding: 18px;
   border-radius: 12px;
   background: #fff;
   border: 1px solid #e5e7eb;
   transition: box-shadow 0.2s, transform 0.2s;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .item-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
+}
+
+.item-card__body {
+  padding: 18px;
 }
 
 .item-card__header {

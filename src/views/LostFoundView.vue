@@ -19,6 +19,8 @@
         :tag="item.type === 'lost' ? '寻物' : '招领'"
         :location="item.location"
         :time="item.eventTime"
+        :image="item.image"
+        :fallback-emoji="item.type === 'lost' ? '🔍' : '🎁'"
         @click="goDetail(item.id)"
       >
         <template #footer>
