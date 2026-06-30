@@ -13,7 +13,11 @@
     "lint": "run-s \"lint:*\"",
     "lint:oxlint": "oxlint . --fix",
     "lint:eslint": "eslint . --fix --cache",
-    "mock": "json-server --watch db.json --port 3001"
+    "mock": "json-server --watch db.json --port 3001",
+    "server": "cd server && node index.js",
+    "server:setup": "cd server && node migrate.js && node seed.js",
+    "server:migrate": "cd server && node migrate.js",
+    "server:seed": "cd server && node seed.js"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
