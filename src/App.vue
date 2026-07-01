@@ -106,6 +106,15 @@ function onNavSelect(index: string) {
           </template>
         </el-menu>
 
+        <!-- 用户状态指示器 -->
+        <div class="user-indicator" @click="$router.push('/profile')">
+          <template v-if="userStore.isLoggedIn">
+            <el-avatar :size="26" :icon="UserFilled" class="user-avatar-mini" />
+            <span class="user-name">{{ userStore.currentUser?.name }}</span>
+          </template>
+          <el-button v-else text size="small" class="login-btn">登录</el-button>
+        </div>
+
         <!-- 移动端汉堡按钮 -->
         <el-button
           class="hamburger-btn"
@@ -278,6 +287,33 @@ body {
   background: rgba(0, 0, 0, 0.05) !important;
 }
 
+/* 用户状态指示器 */
+.user-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.user-avatar-mini {
+  flex-shrink: 0;
+}
+
+.user-name {
+  font-size: 13px;
+  color: #555;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.login-btn {
+  color: #555 !important;
+  font-weight: 500;
+}
+
 /* 汉堡按钮 — 默认隐藏，移动端显示 */
 .hamburger-btn {
   display: none;
@@ -395,6 +431,16 @@ body {
   /* 显示汉堡按钮 */
   .hamburger-btn {
     display: flex;
+  }
+
+  /* 用户指示器靠右，仅显示头像 */
+  .user-indicator {
+    margin-left: auto;
+    margin-right: 8px;
+  }
+
+  .user-name {
+    display: none;
   }
 
   /* 隐藏桌面导航 */

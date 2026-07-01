@@ -22,8 +22,20 @@
         @click="goDetail(item.id)"
       >
         <template #footer>
-          <strong>￥{{ item.price }}</strong>
-          <span class="condition">{{ item.condition }}</span>
+          <div class="trade-footer">
+            <div class="trade-footer-left">
+              <strong>￥{{ item.price }}</strong>
+              <span class="condition">{{ item.condition }}</span>
+            </div>
+            <el-button
+              :type="favoritesStore.isFavorited(item.id) ? 'danger' : 'default'"
+              size="small"
+              circle
+              @click.stop="toggleFavorite(item)"
+            >
+              {{ favoritesStore.isFavorited(item.id) ? '❤️' : '🤍' }}
+            </el-button>
+          </div>
         </template>
       </ItemCard>
     </div>
@@ -33,11 +45,16 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { useUserStore } from '../stores/user'
+import { useFavoritesStore } from '../stores/favorites'
 import ItemCard from '../components/ItemCard.vue'
 import EmptyState from '../components/EmptyState.vue'
 import { getTrades, type TradeItem } from '../api/trade'
 
 const router = useRouter()
+const userStore = useUserStore()
+const favoritesStore = useFavoritesStore()
 
 const trades = ref<TradeItem[]>([])
 
@@ -48,6 +65,26 @@ onMounted(async () => {
 
 function goDetail(id: number) {
   router.push({ name: 'Detail', params: { type: 'trade', id } })
+}
+
+function toggleFavorite(item: TradeItem) {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('请先登录后再收藏')
+    router.push('/profile')
+    return
+  }
+  const nowFavorited = favoritesStore.toggleFavorite({
+    id: item.id,
+    title: item.title,
+    category: item.category,
+    price: item.price,
+    condition: item.condition,
+    location: item.location,
+    publishTime: item.publishTime,
+    image: item.image,
+    publisher: item.publisher,
+  })
+  ElMessage.success(nowFavorited ? '已收藏' : '已取消收藏')
 }
 </script>
 
@@ -82,6 +119,19 @@ function goDetail(id: number) {
 .condition {
   margin-left: 12px;
   color: #6b7280;
+}
+
+.trade-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.trade-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 @media (max-width: 768px) {
