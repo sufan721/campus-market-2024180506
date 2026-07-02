@@ -41,10 +41,10 @@ const totalPublished = computed(
 );
 
 const stats = computed(() => [
-  { num: myTrades.value.length, label: "二手交易", color: "#409eff" },
-  { num: myLostFounds.value.length, label: "失物招领", color: "#67c23a" },
-  { num: myGroupBuys.value.length, label: "拼单搭子", color: "#e6a23c" },
-  { num: myErrands.value.length, label: "跑腿委托", color: "#f56c6c" },
+  { num: myTrades.value.length, label: "二手交易", color: "var(--color-accent-blue)" },
+  { num: myLostFounds.value.length, label: "失物招领", color: "var(--color-accent-green)" },
+  { num: myGroupBuys.value.length, label: "拼单搭子", color: "var(--color-accent-orange)" },
+  { num: myErrands.value.length, label: "跑腿委托", color: "var(--color-accent-red)" },
 ]);
 
 // ====== 非交易类发布列表 ======
@@ -431,7 +431,7 @@ watch(
 
       <!-- 活动热力图 -->
       <el-card shadow="never" class="section-card">
-        <ActivityHeatmap :activities="activityData" :week-count="53" />
+        <ActivityHeatmap :activities="activityData" />
       </el-card>
 
       <!-- Tab：我的发布 / 我的收藏 -->
@@ -600,7 +600,7 @@ watch(
 
 .auth-header p {
   margin: 0;
-  color: #999;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
@@ -618,7 +618,7 @@ watch(
 
 .auth-tip {
   text-align: center;
-  color: #a8abb2;
+  color: var(--el-text-color-placeholder);
   font-size: 12px;
   margin: 0;
 }
@@ -652,7 +652,7 @@ watch(
 }
 
 .user-avatar {
-  background: linear-gradient(135deg, #409eff, #337ecc);
+  background: linear-gradient(135deg, var(--color-accent-blue), color-mix(in srgb, var(--color-accent-blue) 80%, #000));
   flex-shrink: 0;
 }
 
@@ -663,7 +663,7 @@ watch(
 
 .user-meta p {
   margin: 0 0 6px;
-  color: #999;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
@@ -693,7 +693,7 @@ watch(
 
 .stat-label {
   font-size: 12px;
-  color: #999;
+  color: var(--color-text-secondary);
 }
 
 /* ====== 通用卡片 ====== */
@@ -710,7 +710,7 @@ watch(
   font-size: 15px;
   font-weight: 600;
   margin: 0 0 14px;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 /* ====== Tab 卡片 ====== */
@@ -739,9 +739,9 @@ watch(
 }
 
 .trade-card {
-  border-radius: 14px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  border-radius: var(--border-radius-card);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
   transition:
     box-shadow 0.2s,
     transform 0.2s;
@@ -753,8 +753,8 @@ watch(
 }
 
 .trade-card:hover {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+  box-shadow: var(--color-card-hover-shadow);
+  transform: translateY(var(--color-card-hover-lift));
 }
 
 .trade-card__body {
@@ -792,8 +792,8 @@ watch(
 }
 
 .tag--trade {
-  background: #ecf5ff;
-  color: #409eff;
+  background: var(--color-tag-primary-bg);
+  color: var(--color-tag-primary-text);
 }
 
 .trade-card__meta {
@@ -806,13 +806,13 @@ watch(
 .trade-price {
   font-size: 18px;
   font-weight: 700;
-  color: #f56c6c;
+  color: var(--color-text-price);
 }
 
 .trade-condition {
   font-size: 12px;
-  color: #999;
-  background: #f5f5f5;
+  color: var(--color-text-secondary);
+  background: var(--color-border-lighter);
   padding: 2px 6px;
   border-radius: 4px;
 }
@@ -822,7 +822,7 @@ watch(
   justify-content: space-between;
   align-items: center;
   font-size: 11px;
-  color: #bbb;
+  color: var(--color-text-placeholder);
 }
 
 .trade-location {
@@ -848,7 +848,7 @@ watch(
 
 /* ====== 其他发布列表 ====== */
 .other-section {
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--color-border-light);
   padding-top: 8px;
 }
 
@@ -857,12 +857,12 @@ watch(
   justify-content: space-between;
   align-items: center;
   padding: 12px 0;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid var(--color-border-lighter);
   transition: background 0.2s;
 }
 
 .menu-item:hover {
-  background: #fafbfc;
+  background: var(--color-hover-bg);
 }
 
 .menu-item-last {
@@ -886,21 +886,21 @@ watch(
 }
 
 .tag-失物招领 {
-  background: #f0f9eb;
-  color: #67c23a;
+  background: var(--color-tag-success-bg);
+  color: var(--color-tag-success-text);
 }
 .tag-拼单搭子 {
-  background: #fdf6ec;
-  color: #e6a23c;
+  background: var(--color-tag-warning-bg);
+  color: var(--color-tag-warning-text);
 }
 .tag-跑腿委托 {
-  background: #fef0f0;
-  color: #f56c6c;
+  background: var(--color-tag-danger-bg);
+  color: var(--color-tag-danger-text);
 }
 
 .item-title {
   font-size: 14px;
-  color: #333;
+  color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -915,11 +915,11 @@ watch(
 
 .item-time {
   font-size: 12px;
-  color: #bbb;
+  color: var(--color-text-placeholder);
 }
 
 .menu-arrow {
-  color: #ccc;
+  color: var(--color-text-placeholder);
   font-size: 14px;
 }
 
@@ -927,12 +927,12 @@ watch(
 .empty-hint {
   padding: 40px 20px;
   text-align: center;
-  color: #999;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
 .empty-hint a {
-  color: #409eff;
+  color: var(--color-text-link);
   text-decoration: none;
 }
 

@@ -45,11 +45,11 @@
     <!-- 图例 -->
     <div class="heatmap-legend">
       <span class="legend-label">Less</span>
-      <span class="legend-block" style="background:#ebedf0" />
-      <span class="legend-block" style="background:#9be9a8" />
-      <span class="legend-block" style="background:#40c463" />
-      <span class="legend-block" style="background:#30a14e" />
-      <span class="legend-block" style="background:#216e39" />
+      <span class="legend-block" :style="{ background: 'var(--color-heatmap-empty)' }" />
+      <span class="legend-block" :style="{ background: 'var(--color-heatmap-l1)' }" />
+      <span class="legend-block" :style="{ background: 'var(--color-heatmap-l2)' }" />
+      <span class="legend-block" :style="{ background: 'var(--color-heatmap-l3)' }" />
+      <span class="legend-block" :style="{ background: 'var(--color-heatmap-l4)' }" />
       <span class="legend-label">More</span>
     </div>
   </div>
@@ -65,10 +65,10 @@ export interface ActivityDay {
 
 const props = withDefaults(defineProps<{
   activities: ActivityDay[]
-  /** 展示多少周（从今天往前算） */
+  /** 展示多少周（从今天往前算，默认 26 周 ≈ 6 个月） */
   weekCount?: number
 }>(), {
-  weekCount: 53,
+  weekCount: 26,
 })
 
 const gridCols = computed(() => props.weekCount)
@@ -89,11 +89,11 @@ interface CellData {
  * 根据 count 返回颜色（GitHub 风格绿色阶梯）
  */
 function pickColor(count: number): string {
-  if (count === 0) return '#ebedf0'
-  if (count === 1) return '#9be9a8'
-  if (count <= 3) return '#40c463'
-  if (count <= 6) return '#30a14e'
-  return '#216e39'
+  if (count === 0) return 'var(--color-heatmap-empty)'
+  if (count === 1) return 'var(--color-heatmap-l1)'
+  if (count <= 3) return 'var(--color-heatmap-l2)'
+  if (count <= 6) return 'var(--color-heatmap-l3)'
+  return 'var(--color-heatmap-l4)'
 }
 
 /**
@@ -119,14 +119,16 @@ const cells = computed<CellData[]>(() => {
     countMap.set(key, (countMap.get(key) || 0) + a.count)
   }
 
-  // 计算网格起始日期：从今天往前推 weekCount 周，并对齐到周一
+  // 以"本周日"为网格终点，往前推 weekCount 周，确保今天一定在网格内
   const totalDays = props.weekCount * 7
-  const startDate = new Date(today)
-  startDate.setDate(today.getDate() - totalDays + 1)
-  // 对齐到周一 (getDay() 0=Sun, 1=Mon, ..., 6=Sat)
-  const dayOfWeek = startDate.getDay()
-  const offsetToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
-  startDate.setDate(startDate.getDate() + offsetToMonday)
+  const todayDay = today.getDay() // 0=Sun, 1=Mon, …, 6=Sat
+  const daysToSunday = todayDay === 0 ? 0 : 7 - todayDay
+  const endDate = new Date(today)
+  endDate.setDate(today.getDate() + daysToSunday)
+
+  // startDate = endDate 往前 totalDays-1 天（自动落在周一）
+  const startDate = new Date(endDate)
+  startDate.setDate(endDate.getDate() - totalDays + 1)
 
   const result: CellData[] = []
   const todayStr = toDateString(today)
@@ -161,11 +163,12 @@ const monthLabels = computed(() => {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const totalDays = cols * 7
-  const startDate = new Date(today)
-  startDate.setDate(today.getDate() - totalDays + 1)
-  const dayOfWeek = startDate.getDay()
-  const offsetToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
-  startDate.setDate(startDate.getDate() + offsetToMonday)
+  const todayDay = today.getDay()
+  const daysToSunday = todayDay === 0 ? 0 : 7 - todayDay
+  const endDate = new Date(today)
+  endDate.setDate(today.getDate() + daysToSunday)
+  const startDate = new Date(endDate)
+  startDate.setDate(endDate.getDate() - totalDays + 1)
 
   const labels: { label: string; col: number }[] = []
   let lastMonth = -1
@@ -231,7 +234,7 @@ function toDateString(d: Date): string {
 
 .month-label {
   font-size: 10px;
-  color: #767676;
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -251,7 +254,7 @@ function toDateString(d: Date): string {
 
 .day-label {
   font-size: 10px;
-  color: #767676;
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -272,7 +275,7 @@ function toDateString(d: Date): string {
   border-radius: 2px;
   cursor: pointer;
   transition: outline 0.1s;
-  outline: 1px solid rgba(27, 31, 35, 0.06);
+  outline: 1px solid var(--shadow-heatmap-cell);
   outline-offset: -1px;
 }
 
@@ -281,7 +284,7 @@ function toDateString(d: Date): string {
 }
 
 .cell--today {
-  outline-color: #409eff;
+  outline-color: var(--el-color-primary);
   outline-width: 2px;
 }
 
@@ -296,7 +299,7 @@ function toDateString(d: Date): string {
 
 .legend-label {
   font-size: 10px;
-  color: #767676;
+  color: var(--color-text-secondary);
   margin: 0 4px;
 }
 
@@ -312,7 +315,7 @@ function toDateString(d: Date): string {
 }
 
 .heatmap-body::-webkit-scrollbar-thumb {
-  background: #ddd;
+  background: var(--color-scrollbar-thumb);
   border-radius: 2px;
 }
 </style>
