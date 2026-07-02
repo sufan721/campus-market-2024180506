@@ -4,6 +4,7 @@ export interface MessageItem {
   id: number
   userId: number
   from: string
+  fromUserId?: number
   content: string
   time: string
   unread: boolean

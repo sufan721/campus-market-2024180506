@@ -21,7 +21,9 @@ export function getAllMyChats() {
   return http.get<ChatMessage[]>('/chatMessages')
 }
 
-/** 发送一条聊天消息（userId 由服务端从 JWT 获取） */
-export function sendChatMessage(data: Omit<ChatMessage, 'id' | 'userId'>) {
+/** 发送一条聊天消息（userId 由服务端从 JWT 获取，contactUserId 用于通知接收方） */
+export function sendChatMessage(
+  data: Omit<ChatMessage, 'id' | 'userId'> & { contactUserId?: number },
+) {
   return http.post<ChatMessage>('/chatMessages', data)
 }
