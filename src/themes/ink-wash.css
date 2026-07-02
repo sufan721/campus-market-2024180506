@@ -1,0 +1,118 @@
+/* ============================================================
+   水墨国风雅致风 — Ink Wash Chinese Literati
+   宣纸米白 · 墨青灰 · 淡墨晕染 · 朱砂红点缀 · 宋体
+   ============================================================ */
+.theme-ink-wash {
+  --color-bg-page: #f7f4ed;
+  --color-bg-surface: #faf8f2;
+  --color-bg-header: rgba(247, 244, 237, 0.85);
+  --color-bg-footer: #f0ede5;
+  --color-bg-chat: #f2efe8;
+
+  --color-text-primary: #2c2416;
+  --color-text-regular: #4a4235;
+  --color-text-secondary: #7a7260;
+  --color-text-placeholder: #b0a896;
+  --color-text-muted: #8c8574;
+  --color-text-price: #c2322a;
+  --color-text-link: #5b6e82;
+  --color-text-inverse: #faf8f2;
+
+  --color-card-bg: #faf8f2;
+  --color-card-border: #e0dac8;
+  --color-card-shadow: 0 1px 6px rgba(44,36,22,0.06);
+  --color-card-hover-shadow: 0 2px 12px rgba(44,36,22,0.08);
+  --color-card-hover-lift: -2px;
+  --border-radius-card: 4px;
+
+  --color-border-lighter: #f2efe8;
+  --color-border-light: #ece8de;
+  --color-border-base: #e0dac8;
+  --color-border-dark: #ccc4b0;
+  --color-border-header: #e0dac8;
+
+  --color-tag-primary-bg: #edede6;
+  --color-tag-primary-text: #5b6e82;
+  --color-tag-success-bg: #e8ede0;
+  --color-tag-success-text: #5a6e4a;
+  --color-tag-warning-bg: #ede6d8;
+  --color-tag-warning-text: #8b7355;
+  --color-tag-danger-bg: #f2e0dc;
+  --color-tag-danger-text: #c2322a;
+
+  --color-accent-blue: #6b7d8e;
+  --color-accent-green: #6b7d5a;
+  --color-accent-orange: #9b8b6e;
+  --color-accent-red: #c2322a;
+
+  --color-accent-blue-bg: #edefec;
+  --color-accent-green-bg: #eef0e8;
+  --color-accent-orange-bg: #f2efe2;
+  --color-accent-red-bg: #f5e8e4;
+
+  --color-hover-bg: #f5f2ea;
+  --color-message-unread-bg: #eef0ea;
+  --color-btn-primary-bg: #5b6e82;
+  --color-btn-primary-hover: #70859a;
+  --color-btn-primary-shadow: 0 2px 8px rgba(91,110,130,0.15);
+  --color-overlay: rgba(44,36,22,0.35);
+
+  --color-chat-sent-bg: #5b6e82;
+  --color-chat-sent-text: #faf8f2;
+  --color-chat-received-bg: #ffffff;
+
+  --color-image-placeholder-from: #ece8de;
+  --color-image-placeholder-to: #e0dac8;
+
+  --color-chart-bar-highlight-from: #5b6e82;
+  --color-chart-bar-highlight-to: #70859a;
+  --color-chart-bar-normal-from: #c8c4b8;
+  --color-chart-bar-normal-to: #d8d4c8;
+  --color-chart-bar-text: #7a7260;
+
+  --color-heatmap-empty: #e8e4d8;
+  --color-heatmap-l1: #c4d4b8;
+  --color-heatmap-l2: #a0b888;
+  --color-heatmap-l3: #789860;
+  --color-heatmap-l4: #507840;
+
+  --color-scrollbar-thumb: #ccc4b0;
+
+  --shadow-header: 0 1px 6px rgba(44,36,22,0.06);
+  --shadow-bottom-nav: 0 -1px 6px rgba(44,36,22,0.06);
+  --shadow-heatmap-cell: rgba(44,36,22,0.05);
+
+  --font-family-base: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', 'SimSun', 'KaiTi', serif;
+  --color-brand-title: #2c2416;
+  --texture-page-bg: url("data:image/svg+xml,%3Csvg width='300' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  --texture-page-bg-size: auto;
+  --border-radius-btn: 2px;
+  --effect-frosted: blur(8px);
+
+  /* EL overrides */
+  --el-color-primary: #5b6e82;
+  --el-color-primary-light-3: #8c9aad;
+  --el-color-primary-light-5: #b0bac6;
+  --el-color-primary-light-7: #cdd3da;
+  --el-color-primary-light-9: #e8eaec;
+  --el-color-success: #6b7d5a;
+  --el-color-warning: #9b8b6e;
+  --el-color-danger: #c2322a;
+  --el-color-info: #6b7d8e;
+  --el-bg-color: #faf8f2;
+  --el-bg-color-page: #f7f4ed;
+  --el-bg-color-overlay: #faf8f2;
+  --el-text-color-primary: #2c2416;
+  --el-text-color-regular: #4a4235;
+  --el-text-color-secondary: #7a7260;
+  --el-text-color-placeholder: #b0a896;
+  --el-border-color: #e0dac8;
+  --el-border-color-light: #ece8de;
+  --el-border-color-lighter: #f2efe8;
+  --el-border-color-extra-light: #f6f4ea;
+  --el-fill-color: #f5f2ea;
+  --el-fill-color-light: #faf8f2;
+  --el-fill-color-lighter: #fcfbf6;
+  --el-border-radius-base: 2px;
+  --el-border-radius-small: 1px;
+}

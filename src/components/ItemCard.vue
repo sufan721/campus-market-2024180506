@@ -48,17 +48,17 @@ defineEmits<{
 
 <style scoped>
 .item-card {
-  border-radius: 12px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  border-radius: var(--border-radius-card);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
   transition: box-shadow 0.2s, transform 0.2s;
   cursor: pointer;
   overflow: hidden;
 }
 
 .item-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
+  box-shadow: var(--color-card-hover-shadow);
+  transform: translateY(var(--color-card-hover-lift));
 }
 
 .item-card__body {
@@ -80,22 +80,22 @@ defineEmits<{
 .tag {
   padding: 4px 8px;
   border-radius: 999px;
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--color-tag-primary-bg);
+  color: var(--color-tag-primary-text);
   font-size: 12px;
   white-space: nowrap;
 }
 
 .description {
   margin: 12px 0;
-  color: #4b5563;
+  color: var(--color-text-regular);
   line-height: 1.6;
 }
 
 .meta {
   display: flex;
   gap: 16px;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   font-size: 13px;
 }
 

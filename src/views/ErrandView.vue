@@ -60,8 +60,8 @@ function goDetail(id: number) {
 
 .page-header {
   padding: 24px;
-  border-radius: 16px;
-  background: #fff;
+  border-radius: var(--border-radius-card);
+  background: var(--color-card-bg);
 }
 
 .page-header h1 {
@@ -70,7 +70,7 @@ function goDetail(id: number) {
 
 .page-header p {
   margin: 0;
-  color: #6b7280;
+  color: var(--color-text-regular);
 }
 
 .list {
@@ -80,13 +80,13 @@ function goDetail(id: number) {
 }
 
 .reward {
-  color: #f56c6c;
+  color: var(--color-text-price);
   font-size: 16px;
 }
 
 .publisher {
   margin-left: 12px;
-  color: #6b7280;
+  color: var(--color-text-regular);
   font-size: 13px;
 }
 

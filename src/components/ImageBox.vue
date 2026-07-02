@@ -58,14 +58,14 @@ function onLoad() {
   position: relative;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(135deg, #e8f4fd 0%, #dce9f5 100%);
+  background: linear-gradient(135deg, var(--color-image-placeholder-from) 0%, var(--color-image-placeholder-to) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .image-box--placeholder {
-  background: linear-gradient(135deg, #e8f4fd 0%, #dce9f5 100%);
+  background: linear-gradient(135deg, var(--color-image-placeholder-from) 0%, var(--color-image-placeholder-to) 100%);
 }
 
 .image-box__img {

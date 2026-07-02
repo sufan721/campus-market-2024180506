@@ -1,23 +1,22 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { HomeFilled, List, Edit, ChatDotRound, UserFilled, Expand, Fold, Goods, Search, Connection, Service } from '@element-plus/icons-vue'
+import { HomeFilled, Edit, ChatDotRound, UserFilled, Expand, Fold, Goods, Search, Connection, Service } from '@element-plus/icons-vue'
 import { useUserStore } from './stores/user'
 import { useFavoritesStore } from './stores/favorites'
+import { useThemeStore } from './stores/theme'
+import ThemeSwitcher from './components/ThemeSwitcher.vue'
 
 const route = useRoute()
 const userStore = useUserStore()
 const favoritesStore = useFavoritesStore()
+const themeStore = useThemeStore()
 const activeIndex = ref('/home')
 const drawerVisible = ref(false)
 
-// 业务子页面的路由列表
-const bizRoutes = ['/trades', '/lost-found', '/group-buy', '/errands']
-
 // 监听路由变化更新活跃菜单
 watch(() => route.path, (path) => {
-  // 业务子页面高亮"分类"父菜单
-  activeIndex.value = bizRoutes.includes(path) ? '/trades' : path
+  activeIndex.value = path
 })
 
 // 屏幕宽度检测
@@ -27,8 +26,9 @@ window.addEventListener('resize', () => {
   isMobile.value = window.innerWidth < 768
 })
 
-// 初始化认证状态
+// 初始化认证状态 & 主题
 onMounted(async () => {
+  themeStore.initTheme()
   await userStore.initAuth()
   if (userStore.isLoggedIn) {
     favoritesStore.load()
@@ -41,25 +41,24 @@ interface NavItem {
   label: string
 }
 
-const navItems: NavItem[] = [
+const allNavItems: NavItem[] = [
   { index: '/home', icon: HomeFilled, label: '首页' },
-  { index: '/trades', icon: List, label: '分类' },
+  { index: '/trades', icon: Goods, label: '二手交易' },
+  { index: '/lost-found', icon: Search, label: '失物招领' },
+  { index: '/group-buy', icon: Connection, label: '拼单搭子' },
+  { index: '/errands', icon: Service, label: '跑腿委托' },
   { index: '/publish', icon: Edit, label: '发布' },
   { index: '/message', icon: ChatDotRound, label: '消息' },
   { index: '/profile', icon: UserFilled, label: '我的' },
 ]
 
-interface BizItem {
-  index: string
-  icon: typeof Goods
-  label: string
-}
-
-const bizItems: BizItem[] = [
-  { index: '/trades', icon: Goods, label: '二手交易' },
-  { index: '/lost-found', icon: Search, label: '失物招领' },
-  { index: '/group-buy', icon: Connection, label: '拼单搭子' },
-  { index: '/errands', icon: Service, label: '跑腿委托' },
+/** 移动端底部导航 — 精简 5 项 */
+const bottomNavItems: NavItem[] = [
+  { index: '/home', icon: HomeFilled, label: '首页' },
+  { index: '/trades', icon: Goods, label: '交易' },
+  { index: '/publish', icon: Edit, label: '发布' },
+  { index: '/message', icon: ChatDotRound, label: '消息' },
+  { index: '/profile', icon: UserFilled, label: '我的' },
 ]
 
 function onNavSelect(index: string) {
@@ -79,7 +78,10 @@ function onNavSelect(index: string) {
           <h1 class="brand-title">校园轻集市</h1>
         </div>
 
-        <!-- 桌面端导航 — 内嵌在 header 中 -->
+        <!-- 主题切换 -->
+        <ThemeSwitcher />
+
+        <!-- 桌面端导航 — 全部平铺 -->
         <el-menu
           :default-active="activeIndex"
           mode="horizontal"
@@ -88,22 +90,10 @@ function onNavSelect(index: string) {
           class="header-nav desktop-nav"
           @select="(index: string) => activeIndex = index"
         >
-          <template v-for="item in navItems" :key="item.index">
-            <el-sub-menu v-if="item.index === '/trades'" index="biz-sub">
-              <template #title>
-                <el-icon><component :is="item.icon" /></el-icon>
-                <span>{{ item.label }}</span>
-              </template>
-              <el-menu-item v-for="biz in bizItems" :key="biz.index" :index="biz.index">
-                <el-icon><component :is="biz.icon" /></el-icon>
-                <span>{{ biz.label }}</span>
-              </el-menu-item>
-            </el-sub-menu>
-            <el-menu-item v-else :index="item.index">
-              <el-icon><component :is="item.icon" /></el-icon>
-              <span>{{ item.label }}</span>
-            </el-menu-item>
-          </template>
+          <el-menu-item v-for="item in allNavItems" :key="item.index" :index="item.index">
+            <el-icon><component :is="item.icon" /></el-icon>
+            <span>{{ item.label }}</span>
+          </el-menu-item>
         </el-menu>
 
         <!-- 用户状态指示器 -->
@@ -128,7 +118,7 @@ function onNavSelect(index: string) {
     <!-- 移动端底部导航栏 -->
     <div class="mobile-bottom-nav">
       <router-link
-        v-for="item in navItems"
+        v-for="item in bottomNavItems"
         :key="item.index"
         :to="item.index"
         class="bottom-nav-item"
@@ -158,22 +148,10 @@ function onNavSelect(index: string) {
         class="drawer-menu"
         @select="(index: string) => onNavSelect(index)"
       >
-        <template v-for="item in navItems" :key="item.index">
-          <el-sub-menu v-if="item.index === '/trades'" index="biz-sub-drawer">
-            <template #title>
-              <el-icon><component :is="item.icon" /></el-icon>
-              <span>{{ item.label }}</span>
-            </template>
-            <el-menu-item v-for="biz in bizItems" :key="biz.index" :index="biz.index">
-              <el-icon><component :is="biz.icon" /></el-icon>
-              <span>{{ biz.label }}</span>
-            </el-menu-item>
-          </el-sub-menu>
-          <el-menu-item v-else :index="item.index">
-            <el-icon><component :is="item.icon" /></el-icon>
-            <span>{{ item.label }}</span>
-          </el-menu-item>
-        </template>
+        <el-menu-item v-for="item in allNavItems" :key="item.index" :index="item.index">
+          <el-icon><component :is="item.icon" /></el-icon>
+          <span>{{ item.label }}</span>
+        </el-menu-item>
       </el-menu>
     </el-drawer>
 
@@ -198,8 +176,10 @@ function onNavSelect(index: string) {
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: #f0f2f5;
+  font-family: var(--font-family-base);
+  background-color: var(--color-bg-page);
+  background-image: var(--texture-page-bg);
+  background-size: var(--texture-page-bg-size, auto);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -215,16 +195,18 @@ body {
   flex-direction: column;
 }
 
-/* ========== 顶部（浅灰色） ========== */
+/* ========== 顶部 ========== */
 .app-header {
   --header-height: 52px;
   height: var(--header-height);
-  background: #f0f1f3;
+  background: var(--color-bg-header);
+  backdrop-filter: var(--effect-frosted);
+  -webkit-backdrop-filter: var(--effect-frosted);
   padding: 0;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-header);
 }
 
 .header-content {
@@ -253,38 +235,47 @@ body {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #333;
+  color: var(--color-brand-title);
   letter-spacing: 1px;
   white-space: nowrap;
 }
 
-/* 桌面端导航 — 内嵌在 header */
+/* 桌面端导航 — 圆润胶囊标签 */
 .header-nav {
   margin-left: auto;
   background: transparent !important;
   border-bottom: none !important;
   height: var(--header-height);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .header-nav :deep(.el-menu-item) {
-  height: var(--header-height);
-  line-height: var(--header-height);
-  font-size: 14px;
+  height: 34px;
+  line-height: 34px;
+  margin: 0 2px;
+  padding: 0 16px;
+  font-size: 13.5px;
   font-weight: 500;
-  color: #555;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
+  color: var(--color-text-regular);
+  border-radius: 20px;
+  border-bottom: none !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header-nav :deep(.el-menu-item:hover) {
-  color: #333 !important;
-  background: rgba(0, 0, 0, 0.04) !important;
+  color: var(--color-text-primary) !important;
+  background: var(--color-hover-bg) !important;
+  border-radius: 20px;
 }
 
 .header-nav :deep(.el-menu-item.is-active) {
-  color: #222 !important;
-  border-bottom-color: #666 !important;
-  background: rgba(0, 0, 0, 0.05) !important;
+  color: #fff !important;
+  background: var(--color-btn-primary-bg) !important;
+  border-radius: 20px;
+  font-weight: 600;
+  box-shadow: var(--color-btn-primary-shadow);
 }
 
 /* 用户状态指示器 */
@@ -304,13 +295,13 @@ body {
 
 .user-name {
   font-size: 13px;
-  color: #555;
+  color: var(--color-text-regular);
   font-weight: 500;
   white-space: nowrap;
 }
 
 .login-btn {
-  color: #555 !important;
+  color: var(--color-text-regular) !important;
   font-weight: 500;
 }
 
@@ -320,7 +311,7 @@ body {
   margin-left: auto;
   background: rgba(0, 0, 0, 0.04) !important;
   border-color: rgba(0, 0, 0, 0.12) !important;
-  color: #555 !important;
+  color: var(--color-text-regular) !important;
 }
 
 /* ========== 移动端底部导航 ========== */
@@ -330,11 +321,11 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  background: #fff;
-  border-top: 1px solid #e8e8e8;
+  background: var(--color-bg-footer);
+  border-top: 1px solid var(--color-border-light);
   z-index: 100;
   padding: 6px 0 env(safe-area-inset-bottom, 0);
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-bottom-nav);
 }
 
 .bottom-nav-item {
@@ -345,13 +336,13 @@ body {
   gap: 2px;
   padding: 6px 4px;
   text-decoration: none;
-  color: #999;
+  color: var(--color-text-secondary);
   font-size: 11px;
   transition: color 0.2s;
 }
 
 .bottom-nav-item.active {
-  color: #555;
+  color: var(--color-text-regular);
 }
 
 /* ========== 抽屉菜单 ========== */
@@ -360,8 +351,8 @@ body {
   align-items: center;
   gap: 10px;
   padding: 18px 20px 12px;
-  background: #f0f1f3;
-  color: #333;
+  background: var(--color-bg-header);
+  color: var(--color-text-primary);
   font-size: 17px;
   font-weight: 700;
   margin-bottom: 8px;
@@ -373,6 +364,29 @@ body {
 
 .drawer-menu {
   border-right: none !important;
+}
+
+.drawer-menu :deep(.el-menu-item) {
+  border-radius: 12px;
+  margin: 2px 8px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-regular);
+  transition: all 0.2s;
+}
+
+.drawer-menu :deep(.el-menu-item:hover) {
+  color: var(--color-text-primary) !important;
+  background: var(--color-hover-bg) !important;
+}
+
+.drawer-menu :deep(.el-menu-item.is-active) {
+  color: #fff !important;
+  background: var(--color-btn-primary-bg) !important;
+  font-weight: 600;
+  box-shadow: var(--color-btn-primary-shadow);
 }
 
 /* ========== 主内容区 ========== */
@@ -402,10 +416,10 @@ body {
 .app-footer {
   text-align: center;
   padding: 16px;
-  color: #999;
+  color: var(--color-text-secondary);
   font-size: 13px;
-  background: #fff;
-  border-top: 1px solid #eee;
+  background: var(--color-bg-footer);
+  border-top: 1px solid var(--color-border-light);
 }
 
 /* ========== RESPONSIVE ========== */

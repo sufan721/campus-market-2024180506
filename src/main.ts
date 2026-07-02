@@ -7,6 +7,14 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
 import router from './router'
 
+// 主题 CSS
+import './themes/variables.css'
+import './themes/default.css'
+import './themes/minimalist.css'
+import './themes/vintage.css'
+import './themes/macaron.css'
+import './themes/ink-wash.css'
+
 const app = createApp(App)
 
 app.use(createPinia())

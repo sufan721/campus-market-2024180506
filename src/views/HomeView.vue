@@ -8,10 +8,10 @@ import ImageBox from '../components/ImageBox.vue'
 const router = useRouter()
 
 const features = [
-  { icon: List, title: '浏览信息', desc: '发现校园内的二手好物与服务', color: '#409eff' },
-  { icon: Edit, title: '发布信息', desc: '快速发布你想出售的商品或服务', color: '#67c23a' },
-  { icon: ChatDotRound, title: '即时沟通', desc: '买卖双方在线交流，高效便捷', color: '#e6a23c' },
-  { icon: TrendCharts, title: '数据看板', desc: '实时查看平台运营数据概览', color: '#f56c6c' },
+  { icon: List, title: '浏览信息', desc: '发现校园内的二手好物与服务', color: 'var(--color-accent-blue)', bg: 'var(--color-accent-blue-bg)' },
+  { icon: Edit, title: '发布信息', desc: '快速发布你想出售的商品或服务', color: 'var(--color-accent-green)', bg: 'var(--color-accent-green-bg)' },
+  { icon: ChatDotRound, title: '即时沟通', desc: '买卖双方在线交流，高效便捷', color: 'var(--color-accent-orange)', bg: 'var(--color-accent-orange-bg)' },
+  { icon: TrendCharts, title: '数据看板', desc: '实时查看平台运营数据概览', color: 'var(--color-accent-red)', bg: 'var(--color-accent-red-bg)' },
 ]
 
 // ========== 平台数据滚动计数器 ==========
@@ -152,7 +152,7 @@ function goDetail(id: number) {
       <el-row :gutter="20">
         <el-col v-for="(f, idx) in features" :key="f.title" :xs="24" :sm="12" :md="6">
           <el-card shadow="hover" class="feature-card" :style="{ animationDelay: `${idx * 0.12}s` }">
-            <div class="feature-icon-wrap" :style="{ background: f.color + '18', color: f.color }">
+            <div class="feature-icon-wrap" :style="{ background: f.bg, color: f.color }">
               <el-icon :size="28"><component :is="f.icon" /></el-icon>
             </div>
             <h3 class="feature-title">{{ f.title }}</h3>
@@ -377,16 +377,16 @@ function goDetail(id: number) {
 }
 
 .hero-btn-primary {
-  background: #409eff;
-  color: #fff;
-  border-color: #409eff;
+  background: var(--color-btn-primary-bg);
+  color: var(--color-text-inverse);
+  border-color: var(--color-btn-primary-bg);
 }
 
 .hero-btn-primary:hover {
-  background: #66b1ff;
-  border-color: #66b1ff;
+  background: var(--color-btn-primary-hover);
+  border-color: var(--color-btn-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(64, 158, 255, 0.35);
+  box-shadow: var(--color-btn-primary-shadow);
 }
 
 .hero-btn-outline {
@@ -471,13 +471,13 @@ function goDetail(id: number) {
   margin: 0 0 6px;
   font-size: 17px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .feature-desc {
   margin: 0;
   font-size: 13px;
-  color: #999;
+  color: var(--color-text-secondary);
   line-height: 1.5;
 }
 
@@ -494,13 +494,13 @@ function goDetail(id: number) {
   margin: 0 0 4px;
   font-size: 22px;
   font-weight: 700;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .section-subtitle {
   margin: 0;
   font-size: 14px;
-  color: #999;
+  color: var(--color-text-secondary);
 }
 
 /* 商品卡片 */
@@ -549,7 +549,7 @@ function goDetail(id: number) {
 .product-desc {
   margin: 0 0 12px;
   font-size: 13px;
-  color: #999;
+  color: var(--color-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -564,7 +564,7 @@ function goDetail(id: number) {
 .product-price {
   font-size: 20px;
   font-weight: 700;
-  color: #f56c6c;
+  color: var(--color-text-price);
 }
 
 /* 快速入口 */
@@ -582,7 +582,7 @@ function goDetail(id: number) {
 .quick-label {
   font-size: 16px;
   font-weight: 500;
-  color: #555;
+  color: var(--color-text-regular);
 }
 
 /* ================================================

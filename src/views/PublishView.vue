@@ -637,16 +637,16 @@ async function submitPublish() {
 
 .subtitle {
   margin: 0;
-  color: #999;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
 .subtitle strong {
-  color: #409eff;
+  color: var(--color-text-link);
 }
 
 .form-card {
-  border-radius: 12px;
+  border-radius: var(--border-radius-card);
 }
 
 .form-card :deep(.el-card__body) {
@@ -660,13 +660,13 @@ async function submitPublish() {
   gap: 16px;
   margin-bottom: 28px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .type-label {
   font-size: 15px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   flex-shrink: 0;
 }
 
@@ -682,13 +682,13 @@ async function submitPublish() {
 
 .upload-placeholder p {
   margin: 8px 0 0;
-  color: #999;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
 .upload-hint {
   font-size: 12px !important;
-  color: #bbb !important;
+  color: var(--color-text-placeholder) !important;
 }
 
 .upload-preview {

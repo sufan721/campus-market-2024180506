@@ -65,8 +65,8 @@ function goDetail(id: number) {
 
 .page-header {
   padding: 24px;
-  border-radius: 16px;
-  background: #fff;
+  border-radius: var(--border-radius-card);
+  background: var(--color-card-bg);
 }
 
 .page-header h1 {
@@ -75,7 +75,7 @@ function goDetail(id: number) {
 
 .page-header p {
   margin: 0;
-  color: #6b7280;
+  color: var(--color-text-regular);
 }
 
 .list {

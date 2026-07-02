@@ -1,0 +1,118 @@
+/* ============================================================
+   治愈奶油马卡龙风 — Healing Cream Macaron
+   浅粉 · 奶黄 · 薄荷绿 · 云朵圆角 · 软萌少女感
+   ============================================================ */
+.theme-macaron {
+  --color-bg-page: #fefcf5;
+  --color-bg-surface: #ffffff;
+  --color-bg-header: rgba(255, 250, 252, 0.80);
+  --color-bg-footer: #fffafc;
+  --color-bg-chat: #fef8f8;
+
+  --color-text-primary: #5c4b51;
+  --color-text-regular: #7d6e73;
+  --color-text-secondary: #a8988d;
+  --color-text-placeholder: #cbbcb5;
+  --color-text-muted: #b0a0a5;
+  --color-text-price: #e88a95;
+  --color-text-link: #8bb8a8;
+  --color-text-inverse: #ffffff;
+
+  --color-card-bg: #ffffff;
+  --color-card-border: #f0e0e4;
+  --color-card-shadow: 0 2px 12px rgba(220,180,180,0.12);
+  --color-card-hover-shadow: 0 4px 20px rgba(220,180,180,0.18);
+  --color-card-hover-lift: -4px;
+  --border-radius-card: 20px;
+
+  --color-border-lighter: #fdf0f2;
+  --color-border-light: #f7e8ea;
+  --color-border-base: #f0dce0;
+  --color-border-dark: #e0c8cc;
+  --color-border-header: #f7e8ea;
+
+  --color-tag-primary-bg: #f5eef6;
+  --color-tag-primary-text: #a898b8;
+  --color-tag-success-bg: #eef6f0;
+  --color-tag-success-text: #8bb8a8;
+  --color-tag-warning-bg: #fbf0e8;
+  --color-tag-warning-text: #d4a88c;
+  --color-tag-danger-bg: #fde8ec;
+  --color-tag-danger-text: #e88a95;
+
+  --color-accent-blue: #b8c8e8;
+  --color-accent-green: #a8d8b8;
+  --color-accent-orange: #f0c8a0;
+  --color-accent-red: #f0a8b8;
+
+  --color-accent-blue-bg: #f4f6fb;
+  --color-accent-green-bg: #f0f8f4;
+  --color-accent-orange-bg: #fef6ee;
+  --color-accent-red-bg: #fef2f5;
+
+  --color-hover-bg: #fef5f8;
+  --color-message-unread-bg: #fef0f5;
+  --color-btn-primary-bg: #e8a0b0;
+  --color-btn-primary-hover: #f0b8c4;
+  --color-btn-primary-shadow: 0 2px 12px rgba(232,160,176,0.25);
+  --color-overlay: rgba(92,75,81,0.3);
+
+  --color-chat-sent-bg: #e8a0b0;
+  --color-chat-sent-text: #ffffff;
+  --color-chat-received-bg: #ffffff;
+
+  --color-image-placeholder-from: #fef0f5;
+  --color-image-placeholder-to: #fde8ec;
+
+  --color-chart-bar-highlight-from: #e8a0b0;
+  --color-chart-bar-highlight-to: #f0b8c4;
+  --color-chart-bar-normal-from: #fce0e8;
+  --color-chart-bar-normal-to: #fef0f5;
+  --color-chart-bar-text: #a8988d;
+
+  --color-heatmap-empty: #f5f0f2;
+  --color-heatmap-l1: #d0e8d8;
+  --color-heatmap-l2: #b0d8b8;
+  --color-heatmap-l3: #88c898;
+  --color-heatmap-l4: #60b870;
+
+  --color-scrollbar-thumb: #f0dce0;
+
+  --shadow-header: 0 2px 12px rgba(220,180,180,0.10);
+  --shadow-bottom-nav: 0 -2px 12px rgba(220,180,180,0.10);
+  --shadow-heatmap-cell: rgba(220,180,180,0.06);
+
+  --font-family-base: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Quicksand, sans-serif;
+  --color-brand-title: #5c4b51;
+  --texture-page-bg: radial-gradient(circle, rgba(232,160,176,0.06) 1px, transparent 1px);
+  --texture-page-bg-size: 20px 20px;
+  --border-radius-btn: 24px;
+  --effect-frosted: blur(10px);
+
+  /* EL overrides */
+  --el-color-primary: #e8a0b0;
+  --el-color-primary-light-3: #f0c0cc;
+  --el-color-primary-light-5: #f5d4dc;
+  --el-color-primary-light-7: #fae4e8;
+  --el-color-primary-light-9: #fdf2f4;
+  --el-color-success: #a8d8b8;
+  --el-color-warning: #f0c8a0;
+  --el-color-danger: #f0a8b8;
+  --el-color-info: #b8c8e8;
+  --el-bg-color: #ffffff;
+  --el-bg-color-page: #fefcf5;
+  --el-bg-color-overlay: #ffffff;
+  --el-text-color-primary: #5c4b51;
+  --el-text-color-regular: #7d6e73;
+  --el-text-color-secondary: #a8988d;
+  --el-text-color-placeholder: #cbbcb5;
+  --el-border-color: #f0dce0;
+  --el-border-color-light: #f7e8ea;
+  --el-border-color-lighter: #fdf0f2;
+  --el-border-color-extra-light: #fef5f6;
+  --el-fill-color: #fef8f8;
+  --el-fill-color-light: #fffafc;
+  --el-fill-color-lighter: #fffdfd;
+  --el-border-radius-base: 14px;
+  --el-border-radius-small: 10px;
+}

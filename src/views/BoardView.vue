@@ -7,10 +7,10 @@ const dashboard = ref<DashboardData | null>(null)
 const loading = ref(true)
 
 const stats = ref([
-  { label: '注册用户', value: 0, icon: UserFilled, color: '#409eff', bg: '#ecf5ff' },
-  { label: '在售商品', value: 0, icon: Goods, color: '#67c23a', bg: '#f0f9eb' },
-  { label: '累计订单', value: 0, icon: Coin, color: '#e6a23c', bg: '#fdf6ec' },
-  { label: '今日活跃', value: 0, icon: TrendCharts, color: '#f56c6c', bg: '#fef0f0' },
+  { label: '注册用户', value: 0, icon: UserFilled, color: 'var(--color-accent-blue)', bg: 'var(--color-accent-blue-bg)' },
+  { label: '在售商品', value: 0, icon: Goods, color: 'var(--color-accent-green)', bg: 'var(--color-accent-green-bg)' },
+  { label: '累计订单', value: 0, icon: Coin, color: 'var(--color-accent-orange)', bg: 'var(--color-accent-orange-bg)' },
+  { label: '今日活跃', value: 0, icon: TrendCharts, color: 'var(--color-accent-red)', bg: 'var(--color-accent-red-bg)' },
 ])
 
 const weeklyData = ref<{ day: string; count: number }[]>([])
@@ -88,8 +88,8 @@ const maxCategory = computed(() => Math.max(...categories.value.map(c => c.count
               :style="{
                 height: (d.count / maxWeekly * 140) + 'px',
                 background: d.count === maxWeekly
-                  ? 'linear-gradient(180deg, #409eff, #66b1ff)'
-                  : 'linear-gradient(180deg, #a0cfff, #c6e2ff)'
+                  ? 'linear-gradient(180deg, var(--color-chart-bar-highlight-from), var(--color-chart-bar-highlight-to))'
+                  : 'linear-gradient(180deg, var(--color-chart-bar-normal-from), var(--color-chart-bar-normal-to))'
               }"
             ></div>
             <span class="bar-label">{{ d.day }}</span>
@@ -136,7 +136,7 @@ const maxCategory = computed(() => Math.max(...categories.value.map(c => c.count
 
 .subtitle {
   margin: 0;
-  color: #999;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
@@ -178,13 +178,13 @@ const maxCategory = computed(() => Math.max(...categories.value.map(c => c.count
 .stat-value {
   font-size: 26px;
   font-weight: 700;
-  color: #333;
+  color: var(--color-text-primary);
   line-height: 1.2;
 }
 
 .stat-label {
   font-size: 13px;
-  color: #999;
+  color: var(--color-text-secondary);
 }
 
 /* 图表卡片 */
@@ -217,7 +217,7 @@ const maxCategory = computed(() => Math.max(...categories.value.map(c => c.count
 
 .bar-value {
   font-size: 12px;
-  color: #999;
+  color: var(--color-chart-bar-text);
   font-weight: 600;
 }
 
@@ -230,7 +230,7 @@ const maxCategory = computed(() => Math.max(...categories.value.map(c => c.count
 
 .bar-label {
   font-size: 13px;
-  color: #999;
+  color: var(--color-chart-bar-text);
   font-weight: 500;
 }
 
@@ -249,7 +249,7 @@ const maxCategory = computed(() => Math.max(...categories.value.map(c => c.count
 .cat-name {
   width: 80px;
   font-size: 14px;
-  color: #555;
+  color: var(--color-text-regular);
   text-align: right;
   font-weight: 500;
 }
@@ -257,7 +257,7 @@ const maxCategory = computed(() => Math.max(...categories.value.map(c => c.count
 .cat-count {
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   width: 40px;
   text-align: left;
 }

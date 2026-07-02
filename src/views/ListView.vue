@@ -125,7 +125,7 @@ function goDetail(id: number) {
 
 .subtitle {
   margin: 0;
-  color: #999;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
@@ -174,7 +174,7 @@ function goDetail(id: number) {
 .item-desc {
   margin: 0 0 12px;
   font-size: 13px;
-  color: #999;
+  color: var(--color-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -189,7 +189,7 @@ function goDetail(id: number) {
 .item-price {
   font-size: 20px;
   font-weight: 700;
-  color: #f56c6c;
+  color: var(--color-text-price);
 }
 
 .empty-state {
