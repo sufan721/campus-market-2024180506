@@ -75,14 +75,18 @@ function goBack() {
   router.back()
 }
 
-function handleContact(contactName?: string) {
+function handleContact(contactName?: string, contactUserId?: number) {
   if (!userStore.isLoggedIn) {
     ElMessage.warning('请先登录后再联系')
     router.push('/profile')
     return
   }
   const target = contactName || '发布者'
-  router.push(`/chat/${encodeURIComponent(target)}`)
+  let route = `/chat/${encodeURIComponent(target)}`
+  if (contactUserId) {
+    route += `?userId=${contactUserId}`
+  }
+  router.push(route)
 }
 
 const isTradeFavorited = computed(() => {
@@ -169,7 +173,7 @@ function toggleFavorite() {
       </el-card>
 
       <div class="actions">
-        <el-button type="primary" size="large" @click="handleContact(trade.publisher)">
+        <el-button type="primary" size="large" @click="handleContact(trade.publisher, trade.userId)">
           💬 联系卖家
         </el-button>
         <el-button
@@ -227,7 +231,7 @@ function toggleFavorite() {
       </el-card>
 
       <div class="actions">
-        <el-button type="primary" size="large" @click="handleContact()">
+        <el-button type="primary" size="large" @click="handleContact('发布者', lostFound.userId)">
           💬 联系发布者
         </el-button>
         <el-button size="large" @click="goBack">返回列表</el-button>
@@ -264,7 +268,7 @@ function toggleFavorite() {
           <el-progress
             :percentage="Math.round(groupBuy.currentCount / groupBuy.targetCount * 100)"
             :stroke-width="16"
-            :color="groupBuy.currentCount >= groupBuy.targetCount ? '#67c23a' : '#409eff'"
+            :color="groupBuy.currentCount >= groupBuy.targetCount ? 'var(--color-accent-green)' : 'var(--color-accent-blue)'"
           />
         </div>
         <el-descriptions :column="2" border style="margin-top: 16px;">
@@ -289,7 +293,7 @@ function toggleFavorite() {
       </el-card>
 
       <div class="actions">
-        <el-button type="primary" size="large" @click="handleContact(groupBuy.publisher)">
+        <el-button type="primary" size="large" @click="handleContact(groupBuy.publisher, groupBuy.userId)">
           🤝 参与拼单
         </el-button>
         <el-button size="large" @click="goBack">返回列表</el-button>
@@ -342,7 +346,7 @@ function toggleFavorite() {
       </el-card>
 
       <div class="actions">
-        <el-button type="primary" size="large" @click="handleContact(errand.publisher)">
+        <el-button type="primary" size="large" @click="handleContact(errand.publisher, errand.userId)">
           🏃 我要接单
         </el-button>
         <el-button size="large" @click="goBack">返回列表</el-button>
@@ -366,7 +370,7 @@ function toggleFavorite() {
 
 .detail-image {
   height: 220px;
-  background: linear-gradient(135deg, #e8f4fd 0%, #d0e4f5 100%);
+  background: linear-gradient(135deg, var(--color-image-placeholder-from) 0%, var(--color-image-placeholder-to) 100%);
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -400,13 +404,13 @@ function toggleFavorite() {
 .price {
   font-size: 36px;
   font-weight: 700;
-  color: #f56c6c;
+  color: var(--color-text-price);
   margin: 0 0 8px;
 }
 
 .desc {
   margin: 0;
-  color: #777;
+  color: var(--color-text-regular);
   font-size: 15px;
 }
 
@@ -433,7 +437,7 @@ function toggleFavorite() {
 
 .contact-info {
   margin: 0;
-  color: #555;
+  color: var(--color-text-regular);
   font-size: 15px;
 }
 
@@ -445,12 +449,12 @@ function toggleFavorite() {
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
-  color: #666;
+  color: var(--color-text-regular);
   font-size: 14px;
 }
 
 .progress-header strong {
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 18px;
 }
 

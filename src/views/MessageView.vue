@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { UserFilled } from '@element-plus/icons-vue'
 import { getMessages, markMessageRead, type MessageItem } from '../api/message'
@@ -13,17 +13,26 @@ const loading = ref(true)
 
 const isLoggedIn = computed(() => userStore.isLoggedIn)
 
-onMounted(async () => {
-  if (!isLoggedIn.value) {
-    loading.value = false
-    return
-  }
+let pollTimer: ReturnType<typeof setInterval> | null = null
+
+async function loadMessages() {
+  if (!isLoggedIn.value) return
   try {
     const res = await getMessages()
     messages.value = res.data
   } finally {
     loading.value = false
   }
+}
+
+onMounted(() => {
+  loadMessages()
+  // 每 5 秒轮询一次，有新消息自动更新
+  pollTimer = setInterval(loadMessages, 5000)
+})
+
+onUnmounted(() => {
+  if (pollTimer) clearInterval(pollTimer)
 })
 
 const unreadCount = computed(() => messages.value.filter(m => m.unread).length)
@@ -56,7 +65,11 @@ async function openChat(msg: MessageItem) {
   }
   // 系统通知不跳转聊天
   if (msg.from === '系统通知') return
-  router.push(`/chat/${encodeURIComponent(msg.from)}`)
+  let route = `/chat/${encodeURIComponent(msg.from)}`
+  if (msg.fromUserId) {
+    route += `?userId=${msg.fromUserId}`
+  }
+  router.push(route)
 }
 </script>
 
@@ -131,7 +144,7 @@ async function openChat(msg: MessageItem) {
 
 .subtitle {
   margin: 0;
-  color: #999;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
@@ -156,11 +169,11 @@ async function openChat(msg: MessageItem) {
 }
 
 .message-item:hover {
-  background: #f5f7fa;
+  background: var(--color-hover-bg);
 }
 
 .message-item.unread {
-  background: #ecf5ff;
+  background: var(--color-message-unread-bg);
 }
 
 .avatar-wrap {
@@ -183,12 +196,12 @@ async function openChat(msg: MessageItem) {
 .msg-from {
   font-weight: 600;
   font-size: 15px;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .msg-time {
   font-size: 12px;
-  color: #bbb;
+  color: var(--color-text-placeholder);
   flex-shrink: 0;
   margin-left: 12px;
 }
@@ -196,7 +209,7 @@ async function openChat(msg: MessageItem) {
 .msg-content {
   margin: 0;
   font-size: 14px;
-  color: #888;
+  color: var(--color-text-muted);
   line-height: 1.5;
   overflow: hidden;
   text-overflow: ellipsis;

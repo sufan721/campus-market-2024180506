@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, UserFilled } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -15,22 +15,38 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const contactName = ref(decodeURIComponent(route.params.contactName as string))
+const contactUserId = ref(route.query.userId ? Number(route.query.userId) : undefined)
 const messages = ref<ChatMessage[]>([])
 const loading = ref(true)
 const inputText = ref('')
 const sending = ref(false)
 const chatBody = ref<HTMLElement | null>(null)
 
-onMounted(async () => {
+let pollTimer: ReturnType<typeof setInterval> | null = null
+
+async function loadMessages() {
   try {
     const res = await getChatMessages(contactName.value)
     messages.value = res.data
   } catch {
-    ElMessage.warning('消息加载失败')
+    // 静默轮询，不弹错误
   } finally {
     loading.value = false
-    await scrollToBottom()
   }
+}
+
+onMounted(async () => {
+  await loadMessages()
+  await scrollToBottom()
+  // 每 3 秒轮询，实时显示对方新消息
+  pollTimer = setInterval(async () => {
+    await loadMessages()
+    await scrollToBottom()
+  }, 3000)
+})
+
+onUnmounted(() => {
+  if (pollTimer) clearInterval(pollTimer)
 })
 
 async function scrollToBottom() {
@@ -51,11 +67,14 @@ async function handleSend() {
     `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
     `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
 
-  const newMsg: Omit<ChatMessage, 'id' | 'userId'> = {
+  const newMsg: Omit<ChatMessage, 'id' | 'userId'> & { contactUserId?: number } = {
     contactName: contactName.value,
     content: text,
     time: timeStr,
     direction: 'sent',
+  }
+  if (contactUserId.value) {
+    newMsg.contactUserId = contactUserId.value
   }
 
   try {
@@ -177,8 +196,8 @@ function formatChatTime(timeStr: string): string {
   height: calc(100vh - 140px);
   /* 扣除顶部导航 + footer */
   max-height: calc(100vh - 140px);
-  background: #f2f3f5;
-  border-radius: 16px;
+  background: var(--color-bg-chat);
+  border-radius: var(--border-radius-card);
   overflow: hidden;
 }
 
@@ -188,8 +207,8 @@ function formatChatTime(timeStr: string): string {
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  background: #fff;
-  border-bottom: 1px solid #ebeef5;
+  background: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border-header);
   flex-shrink: 0;
 }
 
@@ -207,7 +226,7 @@ function formatChatTime(timeStr: string): string {
 
 .header-sub {
   font-size: 12px;
-  color: #a8abb2;
+  color: var(--el-text-color-placeholder);
 }
 
 /* ====== 消息区域 ====== */
@@ -218,7 +237,7 @@ function formatChatTime(timeStr: string): string {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  background: #f2f3f5;
+  background: var(--color-bg-chat);
 }
 
 .chat-body::-webkit-scrollbar {
@@ -226,7 +245,7 @@ function formatChatTime(timeStr: string): string {
 }
 
 .chat-body::-webkit-scrollbar-thumb {
-  background: #d0d0d0;
+  background: var(--color-scrollbar-thumb);
   border-radius: 4px;
 }
 
@@ -237,7 +256,7 @@ function formatChatTime(timeStr: string): string {
   justify-content: center;
   gap: 8px;
   margin: auto;
-  color: #a8abb2;
+  color: var(--el-text-color-placeholder);
   font-size: 14px;
 }
 
@@ -245,7 +264,7 @@ function formatChatTime(timeStr: string): string {
 .chat-empty {
   text-align: center;
   margin: auto;
-  color: #a8abb2;
+  color: var(--el-text-color-placeholder);
 }
 
 .empty-icon {
@@ -256,12 +275,12 @@ function formatChatTime(timeStr: string): string {
 .chat-empty p {
   margin: 0 0 4px;
   font-size: 15px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 .empty-sub {
   font-size: 13px !important;
-  color: #a8abb2 !important;
+  color: var(--el-text-color-placeholder) !important;
 }
 
 /* ====== 消息项 ====== */
@@ -308,20 +327,20 @@ function formatChatTime(timeStr: string): string {
 }
 
 .msg-sent .msg-bubble {
-  background: #409eff;
-  color: #fff;
+  background: var(--color-chat-sent-bg);
+  color: var(--color-chat-sent-text);
   border-bottom-right-radius: 6px;
 }
 
 .msg-received .msg-bubble {
-  background: #fff;
-  color: #303133;
+  background: var(--color-chat-received-bg);
+  color: var(--el-text-color-primary);
   border-bottom-left-radius: 6px;
 }
 
 .msg-time {
   font-size: 11px;
-  color: #a8abb2;
+  color: var(--el-text-color-placeholder);
   margin-top: 4px;
   padding: 0 4px;
 }
@@ -332,8 +351,8 @@ function formatChatTime(timeStr: string): string {
   align-items: flex-end;
   gap: 10px;
   padding: 10px 14px;
-  background: #fff;
-  border-top: 1px solid #ebeef5;
+  background: var(--color-bg-surface);
+  border-top: 1px solid var(--color-border-header);
   flex-shrink: 0;
 }
 
